@@ -9,6 +9,10 @@ Igual que la Guía 03, este documento se consulta cada vez que voy a tocar una p
 
 **Importante sobre vigencia:** confío en el contenido de este documento tal como está escrito, sin volver a verificarlo contra la documentación oficial en cada uso.
 
+**Sobre el color:** esta guía no decide qué color usar en ningún componente — eso vive en `07_guia_sistema_color.md`. Cualquier `background-color`, `color`, o `border-color` que un componente necesite se toma de las variables CSS definidas ahí (`var(--color-primario)`, `var(--color-sobre-superficie)`, etc.), nunca de un valor hex elegido a criterio propio dentro de un archivo de componente o un estilo en línea.
+
+**Regla de idioma:** los nombres de componentes, páginas, ganchos personalizados, servicios y funciones que representan conceptos del dominio van en español: `TarjetaProducto`, `FormularioRegistro`, `usePedidoActivo`, `servicios/productos.servicio.js`. Los hooks nativos de React y los identificadores técnicos estándar del lenguaje se quedan en inglés: `useState`, `useEffect`, `useReducer`, `props`, `children`.
+
 ## El estándar de referencia
 
 La fuente principal de esta guía es la documentación oficial de React (`react.dev`), en particular "You Might Not Need an Effect", "Rules of Hooks", y la regla de lint `exhaustive-deps` del plugin oficial `eslint-plugin-react-hooks`. Para el criterio de qué herramienta de gestión de estado usar en cada caso, esta guía aplica el criterio de simplicidad (Guía 02): este proyecto NO incorpora librerías externas de estado (Redux, Zustand, TanStack Query, Jotai) salvo que, durante la construcción, se demuestre una necesidad concreta que `useState`, `useReducer` y `Context` nativos no puedan resolver razonablemente — aplicación directa de YAGNI.
@@ -20,18 +24,18 @@ La fuente principal de esta guía es la documentación oficial de React (`react.
 **Qué hacer:**
 ```
 /src
-  /components    → componentes de UI reutilizables (botones, tarjetas, formularios genéricos)
-  /pages         → componentes de página/vista, uno por ruta principal
-  /hooks         → hooks personalizados reutilizables (ej. useCarrito, useAuth)
-  /services      → funciones que llaman a la API de Express (fetch/axios)
-  /context       → Context API, solo para estado verdaderamente global (ej. sesión de usuario)
+  /componentes   → componentes de UI reutilizables (botones, tarjetas, formularios genéricos)
+  /paginas       → componentes de página/vista, uno por ruta principal
+  /ganchos       → hooks personalizados reutilizables (ej. useCarrito, useAuth)
+  /servicios     → funciones que llaman a la API de Express (fetch/axios)
+  /contexto      → Context API, solo para estado verdaderamente global (ej. sesión de usuario)
   App.jsx
 ```
 
-**Qué NO hacer:** crear una carpeta nueva por cada componente pequeño "por organización", sin que el proyecto la necesite todavía. Un componente que solo se usa en una página vive junto a esa página o en `/components` si es genuinamente reutilizable.
+**Qué NO hacer:** crear una carpeta nueva por cada componente pequeño "por organización", sin que el proyecto la necesite todavía. Un componente que solo se usa en una página vive junto a esa página o en `/componentes` si es genuinamente reutilizable.
 
 **DoD:**
-- [ ] Un componente que solo se usa en una página vive junto a esa página o en `/components` si es genuinamente reutilizable — no se crea una carpeta nueva por cada componente pequeño sin necesidad.
+- [ ] Un componente que solo se usa en una página vive junto a esa página o en `/componentes` si es genuinamente reutilizable — no se crea una carpeta nueva por cada componente pequeño sin necesidad.
 
 ---
 
@@ -270,7 +274,7 @@ function FormularioRegistro() {
 
 **Qué hacer — forma estándar:**
 ```javascript
-// services/productos.service.js (frontend)
+// servicios/productos.servicio.js (frontend)
 const BASE_URL = '/api/productos';
 
 export async function crearProducto(datos) {
@@ -310,6 +314,6 @@ export async function crearProducto(datos) {
 **Por qué esto falla:** `fetch` no lanza una excepción cuando el servidor responde con un código de error HTTP (4xx, 5xx) — solo lanza excepción si la red falla. Sin la verificación de `respuesta.ok`, el código que llama a esta función trata una respuesta de error como si fuera un éxito.
 
 **DoD:**
-- [ ] Las funciones que llaman a la API viven en `/services`, separadas de los componentes — un componente nunca hace `fetch` directamente en su cuerpo.
+- [ ] Las funciones que llaman a la API viven en `/servicios`, separadas de los componentes — un componente nunca hace `fetch` directamente en su cuerpo.
 - [ ] Toda función de servicio verifica `respuesta.ok` antes de devolver los datos, y lanza un error legible si la respuesta no fue exitosa.
 - [ ] Los nombres de los campos enviados/recibidos están en camelCase, consistentes con la traducción fijada en la Guía 01, Sección 3.

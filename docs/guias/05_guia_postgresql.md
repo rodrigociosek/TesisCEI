@@ -9,6 +9,8 @@ Igual que las Guías 03 y 04, este documento se consulta cada vez que voy a toca
 
 **Importante sobre vigencia:** confío en el contenido de este documento tal como está escrito, sin volver a verificarlo contra la documentación oficial en cada uso.
 
+**Regla de idioma:** los nombres de tabla, columna, función y variable que representan conceptos del dominio se escriben en español, igual que el MER: `nombre_completo`, `contrasena_hash`, `pedido`, `const usuario`, `function obtenerStockDisponible()`. Los métodos del driver `pg` y las palabras clave de SQL se quedan como son: `.query()`, `.connect()`, `.release()`, `SELECT`, `INSERT`, `WHERE`.
+
 ## El estándar de referencia
 
 La fuente de esta guía es la documentación oficial de node-postgres (`node-postgres.com`, en particular sus páginas de Pooling y Transactions), que es el driver oficial recomendado por la comunidad Node.js para conectar con PostgreSQL, y las convenciones DBML que ya gobiernan el MER de este proyecto (`mer_distribuidora.md`). Este proyecto NO usa un ORM: el propio MER está escrito en DBML puro sin referencia a ningún ORM, y dado el tamaño y las necesidades reales de este proyecto, escribir SQL directo con `pg` es la opción más simple y transparente (Guía 02).

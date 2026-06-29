@@ -13,7 +13,9 @@ Cada bloque sigue, cuando aplica, esta estructura: **qué hacer** (la forma corr
 
 ## El estándar de referencia
 
-La fuente de esta guía es la documentación oficial de Express (`expressjs.com/en/advanced/best-practice-security`, `expressjs.com/en/guide/error-handling`), el OWASP Node.js Security Cheat Sheet, y la documentación oficial de node-postgres (`node-postgres.com`), más las convenciones de estructura de proyecto más extendidas en la comunidad Node/Express actual (patrón de capas: `routes` → `controllers` → `services`/`models` → `config`/`middlewares`).
+La fuente de esta guía es la documentación oficial de Express (`expressjs.com/en/advanced/best-practice-security`, `expressjs.com/en/guide/error-handling`), el OWASP Node.js Security Cheat Sheet, y la documentación oficial de node-postgres (`node-postgres.com`), más las convenciones de estructura de proyecto más extendidas en la comunidad Node/Express actual (patrón de capas: `rutas` → `controladores` → `servicios`/modelos → `config`/`middlewares`).
+
+**Regla de idioma:** las variables, funciones, clases y nombres de archivo que representan conceptos del dominio de este proyecto (entidades, servicios, rutas) se escriben en español, igual que el MER y el diagrama de clases: `usuariosServicio`, `crearProducto()`, `const pedido`, `productos.rutas.js`. Los identificadores técnicos fijos del framework se quedan en inglés: `pool`, `router`, `errorHandler`, `req`, `res`, `next`, `app`.
 
 ---
 
@@ -25,24 +27,24 @@ La fuente de esta guía es la documentación oficial de Express (`expressjs.com/
 ```
 /src
   /config        → conexión a la base, variables de entorno
-  /routes        → definición de endpoints, sin lógica de negocio
-  /controllers   → orquestan: reciben el request, llaman al servicio, responden
-  /services      → lógica de negocio real (lo que el diagrama de clases llama "métodos de dominio")
+  /rutas         → definición de endpoints, sin lógica de negocio
+  /controladores → orquestan: reciben la petición, llaman al servicio, responden
+  /servicios     → lógica de negocio real (lo que el diagrama de clases llama "métodos de dominio")
   /middlewares   → autenticación, manejo de errores, validación de entrada
-  app.js         → configuración de Express (middlewares globales, montaje de rutas)
-  server.js      → arranque del servidor (listen)
+  aplicacion.js  → configuración de Express (middlewares globales, montaje de rutas)
+  servidor.js    → arranque del servidor (listen)
 ```
 
 **Qué NO hacer:**
-- No escribir queries SQL directamente dentro de un archivo de `/routes` o `/controllers` — esto mezcla tres responsabilidades distintas (HTTP, orquestación, acceso a datos) en un solo archivo, y hace que la lógica de negocio sea imposible de probar sin levantar el servidor HTTP completo.
+- No escribir queries SQL directamente dentro de un archivo de `/rutas` o `/controladores` — esto mezcla tres responsabilidades distintas (HTTP, orquestación, acceso a datos) en un solo archivo, y hace que la lógica de negocio sea imposible de probar sin levantar el servidor HTTP completo.
 - No crear una carpeta nueva por cada entidad pequeña "por organización" si el proyecto no la necesita todavía — esto es exactamente el tipo de complejidad anticipada que la Guía 02 (criterio de simplicidad) descarta. La estructura de 5 carpetas de arriba es el techo razonable para este proyecto, no el piso desde el que seguir creciendo por defecto.
 
 **DoR (antes de tocar este bloque):** sé qué entidad de dominio (Guía 01, Sección 4) y qué tabla (Guía 01, Sección 3) está involucrada en el endpoint que voy a crear.
 
 **DoD (para considerar este bloque cumplido en el RF actual):**
-- [ ] La ruta nueva vive en `/routes`, sin lógica de negocio dentro del archivo de ruta.
-- [ ] El controlador nuevo vive en `/controllers`, y es delgado: recibe el request, llama a una función de `/services`, devuelve la respuesta — no contiene queries SQL ni reglas de negocio escritas directamente.
-- [ ] La lógica de negocio real vive en `/services`, usando los métodos y nombres exactos que la Guía 01 (Sección 4) extrajo del diagrama de clases.
+- [ ] La ruta nueva vive en `/rutas`, sin lógica de negocio dentro del archivo de ruta.
+- [ ] El controlador nuevo vive en `/controladores`, y es delgado: recibe la petición, llama a una función de `/servicios`, devuelve la respuesta — no contiene queries SQL ni reglas de negocio escritas directamente.
+- [ ] La lógica de negocio real vive en `/servicios`, usando los métodos y nombres exactos que la Guía 01 (Sección 4) extrajo del diagrama de clases.
 
 ---
 
@@ -52,26 +54,26 @@ La fuente de esta guía es la documentación oficial de Express (`expressjs.com/
 
 **Qué hacer — forma estándar de una ruta:**
 ```javascript
-// routes/productos.routes.js
+// rutas/productos.rutas.js
 import { Router } from 'express';
-import * as productosController from '../controllers/productos.controller.js';
+import * as productosControlador from '../controladores/productos.controlador.js';
 
 const router = Router();
 
-router.post('/productos', productosController.crearProducto);
-router.get('/productos', productosController.listarCatalogo);
+router.post('/productos', productosControlador.crearProducto);
+router.get('/productos', productosControlador.listarCatalogo);
 
 export default router;
 ```
 
 **Qué hacer — forma estándar de un controlador, con manejo explícito del error asíncrono:**
 ```javascript
-// controllers/productos.controller.js
-import * as productosService from '../services/productos.service.js';
+// controladores/productos.controlador.js
+import * as productosServicio from '../servicios/productos.servicio.js';
 
 export async function crearProducto(req, res, next) {
   try {
-    const producto = await productosService.crearProducto(req.body);
+    const producto = await productosServicio.crearProducto(req.body);
     res.status(201).json(producto);
   } catch (error) {
     next(error); // delega al middleware de manejo de errores (Bloque 4)
@@ -83,9 +85,9 @@ export async function crearProducto(req, res, next) {
 ```javascript
 // ❌ Esto se ve igual de "correcto" a simple vista, pero es un error grave:
 export async function crearProducto(req, res) {
-  // sin try/catch: si productosService.crearProducto lanza un error,
+  // sin try/catch: si productosServicio.crearProducto lanza un error,
   // Express 4 NO lo captura. La petición se queda sin responder.
-  const producto = await productosService.crearProducto(req.body);
+  const producto = await productosServicio.crearProducto(req.body);
   res.status(201).json(producto);
 }
 ```
@@ -96,7 +98,7 @@ export async function crearProducto(req, res) {
 // ❌ Manejar el error con un res.status(500) escrito a mano en cada controlador
 export async function crearProducto(req, res) {
   try {
-    const producto = await productosService.crearProducto(req.body);
+    const producto = await productosServicio.crearProducto(req.body);
     res.status(201).json(producto);
   } catch (error) {
     res.status(500).json({ error: 'Error interno' }); // duplica al Bloque 4, sin sus reglas
@@ -128,7 +130,7 @@ export async function registrarUsuario(req, res, next) {
     return res.status(400).json({ error: 'Debés aceptar el tratamiento de datos personales para continuar.' });
   }
   try {
-    const usuario = await usuariosService.registrar(req.body);
+    const usuario = await usuariosServicio.registrar(req.body);
     res.status(201).json(usuario);
   } catch (error) {
     next(error);
@@ -141,8 +143,8 @@ export async function registrarUsuario(req, res, next) {
 // ❌ Confiar en que el frontend ya validó, y pasar req.body directo al servicio sin chequeo alguno
 export async function registrarUsuario(req, res, next) {
   try {
-    const usuario = await usuariosService.registrar(req.body); // si falta un campo, esto falla
-    res.status(201).json(usuario);                              // más abajo, con un error confuso
+    const usuario = await usuariosServicio.registrar(req.body); // si falta un campo, esto falla
+    res.status(201).json(usuario);                               // más abajo, con un error confuso
   } catch (error) {
     next(error);
   }
@@ -205,28 +207,28 @@ app.use('/api/productos', productosRoutes);
 
 **Qué hacer — forma estándar:**
 ```javascript
-// config/db.js
+// config/baseDatos.js
 import { Pool } from 'pg';
 
-export const pool = new Pool({
+export const reservaConexiones = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  max: 20, // máximo de conexiones simultáneas en el pool
+  max: 20, // máximo de conexiones simultáneas en la reserva
 });
 
-pool.on('error', (err) => {
-  console.error('Error inesperado en una conexión inactiva del pool', err);
+reservaConexiones.on('error', (error) => {
+  console.error('Error inesperado en una conexión inactiva de la reserva', error);
 });
 ```
 
 ```javascript
-// services/productos.service.js
-import { pool } from '../config/db.js';
+// servicios/productos.servicio.js
+import { reservaConexiones } from '../config/baseDatos.js';
 
 export async function crearProducto(datos) {
-  const resultado = await pool.query(
+  const resultado = await reservaConexiones.query(
     'INSERT INTO producto (nombre, tipo_producto) VALUES ($1, $2) RETURNING *',
     [datos.nombre, datos.tipoProducto]
   );
@@ -236,17 +238,17 @@ export async function crearProducto(datos) {
 
 **Qué NO hacer:**
 ```javascript
-// ❌ Crear un Pool nuevo dentro de un controlador o servicio, en cada request
+// ❌ Crear un Pool nuevo dentro de un controlador o servicio, en cada petición
 export async function crearProducto(datos) {
-  const pool = new Pool({ /* ...config... */ }); // ¡un Pool nuevo en cada llamada!
-  const resultado = await pool.query('INSERT INTO producto ...', [datos.nombre]);
+  const reservaConexiones = new Pool({ /* ...config... */ }); // ¡un Pool nuevo en cada llamada!
+  const resultado = await reservaConexiones.query('INSERT INTO producto ...', [datos.nombre]);
   return resultado.rows[0];
 }
 ```
-**Por qué esto falla:** cada `new Pool()` abre su propio grupo de conexiones físicas a PostgreSQL. Bajo carga moderada, esto agota rápidamente el `max_connections` del servidor — exactamente el problema que el pool existe para prevenir, multiplicado por la cantidad de requests simultáneos.
+**Por qué esto falla:** cada `new Pool()` abre su propio grupo de conexiones físicas a PostgreSQL. Bajo carga moderada, esto agota rápidamente el `max_connections` del servidor — exactamente el problema que la reserva de conexiones existe para prevenir, multiplicado por la cantidad de peticiones simultáneas.
 
 **DoD:**
-- [ ] Existe un único `Pool` creado en `config/db.js`, importado donde se necesite — nunca se crea un `Pool` nuevo dentro de un controlador o servicio.
+- [ ] Existe una única instancia de `Pool` creada en `config/baseDatos.js`, importada donde se necesite — nunca se crea un `Pool` nuevo dentro de un controlador o servicio.
 - [ ] Toda query usa parámetros posicionales (`$1`, `$2`...) — ver Bloque 6 para el detalle de por qué esto no es negociable.
 - [ ] Los nombres de columna en la query SQL coinciden exactamente con los del MER (snake_case), y la traducción a camelCase ocurre al recibir/devolver el objeto en JavaScript, según lo fijado en la Guía 01, Sección 3.
 
@@ -259,7 +261,7 @@ export async function crearProducto(datos) {
 **Qué hacer:**
 ```javascript
 // ✅ Parámetros posicionales: PostgreSQL trata el valor como dato, nunca como código SQL
-const resultado = await pool.query(
+const resultado = await reservaConexiones.query(
   'SELECT * FROM usuario WHERE telefono = $1',
   [telefono]
 );
@@ -269,7 +271,7 @@ const resultado = await pool.query(
 ```javascript
 // ❌ Concatenación directa de un valor que viene del usuario
 const query = `SELECT * FROM usuario WHERE telefono = '${telefono}'`;
-const resultado = await pool.query(query);
+const resultado = await reservaConexiones.query(query);
 ```
 **Por qué esto es una vulnerabilidad real, no solo "mala práctica":** si `telefono` llega con el valor `' OR '1'='1`, la query ejecutada termina siendo `SELECT * FROM usuario WHERE telefono = '' OR '1'='1'`, que devuelve TODAS las filas de la tabla en vez de ninguna. Con una entrada más elaborada, el mismo patrón permite borrar tablas o extraer datos de otras filas. Esto no depende de que el atacante sea sofisticado — herramientas automatizadas como `sqlmap` (mencionada en la propia documentación oficial de Express) prueban este patrón de forma sistemática contra cualquier endpoint expuesto.
 
@@ -283,7 +285,7 @@ const query = `SELECT * FROM usuario WHERE telefono = '${telefonoSeguro}'`;
 
 **DoD:**
 - [ ] Ninguna query de este RF concatena datos de entrada del usuario directamente dentro del string SQL, bajo ninguna forma (ni directa, ni con escape manual).
-- [ ] Todos los valores variables se pasan como array en el segundo argumento de `pool.query` o `client.query`.
+- [ ] Todos los valores variables se pasan como array en el segundo argumento de `reservaConexiones.query` o `cliente.query`.
 
 ---
 
@@ -293,20 +295,20 @@ const query = `SELECT * FROM usuario WHERE telefono = '${telefonoSeguro}'`;
 
 **Qué hacer:**
 ```javascript
-// El error handler (Bloque 4) registra el detalle completo en el log del servidor,
+// El manejador de errores (Bloque 4) registra el detalle completo en el log del servidor,
 // pero solo envía al cliente un mensaje de negocio controlado.
-export function errorHandler(err, req, res, next) {
-  console.error(err.stack); // detalle completo, solo en el log del servidor
-  const status = err.status || 500;
-  const mensaje = err.status ? err.mensaje : 'Ocurrió un error inesperado.'; // genérico si no es un error esperado
-  res.status(status).json({ error: mensaje });
+export function manejadorErrores(error, req, res, next) {
+  console.error(error.stack); // detalle completo, solo en el log del servidor
+  const estado = error.status || 500;
+  const mensaje = error.status ? error.mensaje : 'Ocurrió un error inesperado.'; // genérico si no es un error esperado
+  res.status(estado).json({ error: mensaje });
 }
 ```
 
 **Qué NO hacer:**
 ```javascript
 // ❌ Devolver el mensaje crudo del error de PostgreSQL o el stack trace al cliente
-res.status(500).json({ error: err.message, stack: err.stack });
+res.status(500).json({ error: error.message, stack: error.stack });
 ```
 **Por qué esto es un riesgo:** un mensaje de PostgreSQL puede revelar el nombre exacto de una tabla o columna, lo cual ayuda a un atacante a refinar un intento de inyección SQL; un stack trace puede revelar rutas de archivos del servidor o versiones de librerías con vulnerabilidades conocidas.
 
@@ -372,8 +374,8 @@ export const loginLimiter = rateLimit({
   message: { error: 'Demasiados intentos. Intentá de nuevo más tarde.' },
 });
 
-// routes/auth.routes.js
-router.post('/login', loginLimiter, authController.iniciarSesion);
+// rutas/autenticacion.rutas.js
+router.post('/login', loginLimiter, autenticacionControlador.iniciarSesion);
 ```
 
 **Qué NO hacer:**

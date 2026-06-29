@@ -44,6 +44,11 @@ Igual que el resto de las guías de este proyecto, no avanzo a la siguiente para
    │            → invocar 03_guia_expressjs.md
    │         ¿Toca componente/vista/formulario/estado de interfaz?
    │            → invocar 04_guia_react.md
+   │         ¿Ese componente/vista necesita color (fondo, texto,
+   │         borde)? → invocar también 07_guia_sistema_color.md
+   │            (siempre junto con 04, nunca sola — el color
+   │            no se decide sin saber primero qué componente
+   │            lo necesita)
    │
    │         Si toca más de una capa (caso más común en este
    │         proyecto), invocar todas las que correspondan,
@@ -93,6 +98,7 @@ Igual que el resto de las guías de este proyecto, no avanzo a la siguiente para
 | "¿Esto que estoy a punto de programar es demasiado complejo?" | `02_guia_criterio_simplicidad.md` |
 | "¿Cómo se estructura una ruta/controlador en Express, hoy?" | `03_guia_expressjs.md` |
 | "¿Cómo se estructura un componente/estado en React, hoy?" | `04_guia_react.md` |
+| "¿Qué color uso para este botón/fondo/texto?" | `07_guia_sistema_color.md` |
 | "¿Cómo se escribe una consulta/transacción en PostgreSQL, hoy?" | `05_guia_postgresql.md` |
 | "¿Cómo confirmo que lo que construí cumple lo que el RF pedía?" | `06_guia_verificacion.md` |
 
@@ -103,3 +109,4 @@ Igual que el resto de las guías de este proyecto, no avanzo a la siguiente para
 - `bd_vs_programacion_distribuidora.md` — clasificación BD vs. programación por RF.
 - `mer_distribuidora.md` — modelo de datos en DBML (PostgreSQL).
 - `diagrama_codigo_completo.md` — diagrama de clases de dominio (Mermaid).
+- `Wireframes_-_Marketplace_Mayorista.html` — wireframe mid-fi, fuente de la estructura visual por pantalla, con trazabilidad explícita a cada RF.

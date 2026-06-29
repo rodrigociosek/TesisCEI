@@ -9,6 +9,8 @@ La Guía General (`00`) me dice que esta es la primera parada del mapa. Este doc
 
 La razón de que este análisis tenga que ser exhaustivo y no superficial es esta: un RF nunca vive solo. Cada RF depende de un modelo de datos ya definido (el MER), de un diseño de clases ya definido (el diagrama de código), y de una clasificación ya hecha sobre qué parte de cada regla vive en la base de datos y qué parte vive en el servidor. Si empiezo a planear la construcción antes de reunir esas cuatro fuentes, el riesgo no es solo planear algo de mala calidad — es planear algo que contradice un diseño que ya existe: usar un nombre de columna distinto al real, reimplementar en JavaScript una validación que Postgres ya garantiza con una constraint, o poner lógica de negocio en el controlador cuando el diagrama de clases ya decidió que esa responsabilidad vive en el dominio.
 
+Hay además un riesgo previo a todos los anteriores, que solo aparece cuando este sistema de guías se aplica sobre un repositorio que ya tiene código escrito de antes: ese código puede no respetar todavía la nomenclatura del MER y el diagrama de clases, porque fue escrito antes de que este sistema existiera. La Sección 0 de este documento resuelve esa duda una sola vez por repositorio, antes de tocar cualquier RF.
+
 ## El estándar en el que se basa el comportamiento de este documento
 
 Cada sección de este documento sigue el patrón **Definition of Ready (DoR) / Definition of Done (DoD)**, usado en metodologías ágiles (Scrum, Extreme Programming) para evitar que se avance sobre trabajo ambiguo:
@@ -25,9 +27,37 @@ Cada sección de este documento sigue el patrón **Definition of Ready (DoR) / D
 
 ---
 
+## SECCIÓN 0 — Diagnóstico de divergencia entre el código ya existente y el diseño (una sola vez por repositorio, no por RF)
+
+**Por qué esta sección existe y por qué va primero:** todas las secciones siguientes de esta guía asumen que el código que ya existe en el repositorio (si existe alguno) respeta la nomenclatura del MER y el diagrama de clases. Cuando un repositorio se retoma con código escrito antes de que estas guías existieran, ese supuesto puede ser falso — y si lo es, construir un RF nuevo encima sin saberlo termina mezclando dos convenciones distintas en el mismo proyecto. Esta sección resuelve esa duda una sola vez, no en cada RF, y queda registrado el resultado para no repetir el trabajo.
+
+**El estándar en el que se basa esta sección:** esto es exactamente lo que la práctica de ingeniería de software llama *auditoría de código heredado contra una especificación* (legacy code audit), cuyo primer paso —antes de cualquier modificación— es siempre un relevamiento del estado real del código, según la literatura estándar de refactorización (Martin Fowler, *Refactoring: Improving the Design of Existing Code*, y la práctica documentada de auditoría previa al refactor). La técnica concreta para hacerlo barato en tokens —que es la que usan agentes de código reales como Aider y Claude Code— es **buscar nombres y firmas con una herramienta de búsqueda de texto (grep/ripgrep) en vez de leer el contenido completo de cada archivo**: se extraen los nombres de tablas, columnas, funciones exportadas y rutas, y esos nombres (no el cuerpo de la lógica) son lo que se compara contra el MER y el diagrama de clases. Leer cada archivo entero de punta a punta para esto sería gastar tokens en contenido que la comparación no necesita.
+
+**DoR:** es la primera vez que se trabaja en este repositorio con este sistema de guías, O no existe todavía un registro de este diagnóstico guardado en el repo (ver DoD de esta sección, último punto).
+
+**Condición de salto (no ejecutar esta sección si se cumple):** si ya existe en el repositorio un archivo `docs/proyecto/diagnostico_divergencia.md` (o equivalente) de una ejecución anterior de esta sección, y ningún archivo de `/backend` o `/frontend` cambió desde la fecha de ese diagnóstico, esta sección se salta por completo — se asume vigente el resultado anterior, sin gastar tokens en repetirlo.
+
+**Qué hago, en este orden, optimizado para no leer más de lo necesario:**
+
+1. **Listar la estructura, no el contenido.** Listo los nombres de archivo y carpetas de `/backend` y `/frontend` (profundidad razonable, sin entrar a `node_modules` ni carpetas de dependencias) — todavía sin abrir ningún archivo.
+2. **Extraer firmas de la base de datos, no las consultas completas.** Si existe una carpeta de modelos, migraciones, o configuración de base, busco (con una herramienta de búsqueda de texto, no leyendo archivo por archivo) los nombres de tabla y columna que el código ya usa — por ejemplo, buscando los patrones que normalmente delatan un nombre de tabla o columna (`CREATE TABLE`, `FROM `, `INSERT INTO`, nombres de propiedades en un esquema). Reúno una lista de nombres encontrados, sin necesidad de leer la lógica completa de cada archivo.
+3. **Extraer firmas de funciones/métodos, no su cuerpo.** Busco las líneas que declaran funciones exportadas o métodos de clase (el encabezado de la función: nombre y parámetros), sin leer el cuerpo completo de cada una salvo que el nombre ya levante una sospecha de discrepancia.
+4. **Comparar esas dos listas de nombres contra el MER (Sección 3 de esta guía) y el diagrama de clases (Sección 4).** Para cada nombre de tabla/columna/método ya existente en el código, verifico si coincide exactamente con su equivalente en el MER/diagrama, o si diverge (nombre distinto, tipo distinto, método con otra firma).
+5. **Registrar el resultado**, no solo concluirlo de memoria: guardo en `docs/proyecto/diagnostico_divergencia.md` la fecha del diagnóstico y la lista de divergencias encontradas (o la confirmación de que no hay divergencias), para que la condición de salto de esta misma sección funcione en el futuro sin tener que repetir el trabajo.
+
+**DoD:**
+- [ ] Tengo la lista de nombres de tabla/columna que el código de `/backend` ya usa, sin haber necesitado leer el cuerpo completo de la lógica de cada archivo para obtenerla.
+- [ ] Tengo la lista de firmas de función/método que el código ya usa, de la misma forma.
+- [ ] Comparé ambas listas contra el MER y el diagrama de clases, y tengo identificadas las divergencias reales (si las hay) — no asumí que "probablemente coincide" sin haber comparado.
+- [ ] Guardé el resultado en `docs/proyecto/diagnostico_divergencia.md`, con fecha, para que esta sección se pueda saltar en el futuro mientras el código no cambie.
+
+**Si el DoD falla, o si se encuentran divergencias:** no se construye el primer RF nuevo todavía. Se reporta al usuario la lista exacta de divergencias encontradas (nombre en el código vs. nombre en el MER/diagrama), y se pregunta cómo proceder: (a) corregir el código existente para que coincida con el diseño, (b) corregir el MER/diagrama si el código existente refleja una decisión válida que el diseño no capturó, o (c) documentar la divergencia como una excepción consciente y seguir adelante solo si el usuario lo autoriza explícitamente — nunca se elige una de estas tres opciones por cuenta propia.
+
+---
+
 ## SECCIÓN 1 — Localizar el requerimiento exacto
 
-**DoR:** tengo un ID de RF (ej. "RF-014") o una descripción suficientemente concreta para ubicarlo sin ambigüedad en `seccion_1_8_lista_requerimientos.md`. Si solo tengo una descripción, la primera tarea de esta sección es resolver el ID exacto antes de continuar.
+**DoR:** Sección 0 cerrada (con DoD cumplido o saltada legítimamente por su condición de salto), y tengo un ID de RF (ej. "RF-014") o una descripción suficientemente concreta para ubicarlo sin ambigüedad en `seccion_1_8_lista_requerimientos.md`. Si solo tengo una descripción, la primera tarea de esta sección es resolver el ID exacto antes de continuar.
 
 **Qué hago:**
 - Busco el bloque completo del RF en `seccion_1_8_lista_requerimientos.md`.
@@ -73,6 +103,7 @@ Cada sección de este documento sigue el patrón **Definition of Ready (DoR) / D
 - Busco en `mer_distribuidora.md` la(s) tabla(s) involucradas en este RF.
 - Extraigo: nombre exacto de la tabla (en snake_case, convención estándar de PostgreSQL), columnas, tipos, constraints (PK, FK, UNIQUE, NOT NULL, CHECK, default), y enums asociados (declarados como `Enum nombre_enum { valor_a valor_b }` en el DBML).
 - Fijo la traducción de nomenclatura snake_case (PostgreSQL) → camelCase (JavaScript) para cada columna que voy a usar, ANTES de escribir cualquier línea de SQL o de JS — esto evita improvisar la traducción a mitad de la implementación y que dos archivos distintos terminen llamando al mismo campo de dos formas distintas.
+- **Regla de idioma:** los nombres de tabla, columna, clase, método y variable que representan conceptos del dominio se escriben en español, igual que el MER y el diagrama de clases. No se traducen al inglés bajo ningún motivo: `usuario` no se convierte en `user`, `pedido` no se convierte en `order`, `obtenerStockDisponible` no se convierte en `getAvailableStock`. Lo que es sintaxis del lenguaje o nombre fijo de una librería se mantiene como esa librería lo define.
 - Leo las `Note:` del DBML cuando existen — frecuentemente documentan el motivo de una constraint (por ejemplo, por qué `telefono` es UNIQUE, o por qué `perfil_configurado` empieza en `false`), y ese motivo es información de negocio que no debería perderse al traducir a código.
 
 **DoD:**
@@ -85,9 +116,33 @@ Cada sección de este documento sigue el patrón **Definition of Ready (DoR) / D
 
 ---
 
+## SECCIÓN 3.5 — Localizar la pantalla correspondiente en el wireframe HTML
+
+**DoR:** Sección 3 cerrada con DoD cumplido, y el RF involucra una pantalla o componente visual (si el RF es puramente de backend sin interfaz, esta sección se marca como "no aplica" y se documenta esa decisión).
+
+**Por qué esta sección existe:** el wireframe (`Wireframes — Marketplace Mayorista.html`) ya define, en fidelidad media, cómo se ve cada pantalla del sistema — qué elementos contiene, cómo se distribuyen, y qué comportamiento tiene en sus casos límite. Si construyo un componente de React sin consultarlo, corro el riesgo de inventar una estructura visual distinta a la ya decidida, exactamente el mismo riesgo que ya se evita en las Secciones 3 y 4 respecto al MER y al diagrama de clases.
+
+**El patrón real del archivo, verificado contra el HTML del proyecto (no es una suposición genérica):** cada pantalla del wireframe es una etiqueta `<section data-label="Nombre de la pantalla · Desktop|Mobile">`. Dentro de cada una, hacia el final, hay un panel de metadatos con etiquetas fijas en este orden: `CU relacionados`, `Rol`, `Modelo estructural` (no siempre presente), `Estado vacío` (no siempre presente), `Comportamiento`, `Accesibilidad`. El valor de cada etiqueta vive en un `<div>` con `background:#E6E6E6` inmediatamente después de la etiqueta. La conexión con el RF específico está siempre en el texto de ese valor, en el formato literal `CU-XX — RF-XXX` (a veces con varios RF separados por `·` o `/`, ej. `CU-26 — RF-024/RF-025/RF-026/RF-027/RF-030`).
+
+**Qué hago, optimizado para no leer el archivo completo (que tiene varios miles de líneas):**
+1. Busco (con una herramienta de búsqueda de texto, no leyendo el archivo entero) el patrón `RF-0XX` o `RF-XXX` correspondiente al número exacto del RF que estoy construyendo, dentro del archivo del wireframe.
+2. Si hay coincidencia, identifico a qué `<section data-label="...">` pertenece esa coincidencia — subo desde la línea encontrada hasta la apertura de `<section>` más cercana hacia arriba para obtener el nombre de la pantalla.
+3. Leo el contenido completo de esa sección puntual (no del archivo entero) para extraer su estructura visual: layout, componentes presentes, y el resto de su panel de metadatos (`Rol`, `Comportamiento`, `Accesibilidad`, `Estado vacío`).
+4. Si el RF tiene tanto versión Desktop como Mobile (dos `<section>` distintas con el mismo nombre base y distinto sufijo `· Desktop` / `· Mobile`), leo ambas — un componente de React responsivo necesita conocer las dos.
+
+**DoD:**
+- [ ] Encontré la(s) sección(es) del wireframe correspondientes a este RF, vía búsqueda de texto del patrón `RF-XXX`, sin haber necesitado leer el archivo completo de punta a punta.
+- [ ] Tengo identificada la estructura visual ya decidida (qué elementos contiene la pantalla, cómo se distribuyen) para usarla como base del componente, en vez de inventar una estructura nueva.
+- [ ] Tengo el contenido de los campos `Rol`, `Comportamiento`, `Estado vacío` y `Accesibilidad` de esa pantalla, si existen — son requisitos de comportamiento ya decididos, no solo referencia visual.
+- [ ] Si el RF tiene versión Desktop y Mobile, tengo ambas.
+
+**Si el DoD falla:** si el RF no tiene ninguna pantalla asociada en el wireframe, dos posibilidades: (a) es un RF de backend puro sin interfaz, en cuyo caso esta sección no aplica y se documenta así; (b) es un vacío real de cobertura del wireframe, en cuyo caso me detengo y pregunto si debo proponer una estructura de pantalla nueva siguiendo el mismo patrón visual ya usado en el resto del wireframe (paneles `surface-container`, tipografía y espaciados ya establecidos — ver Guía 07), en vez de inventar un estilo distinto al del resto del proyecto.
+
+---
+
 ## SECCIÓN 4 — Extraer el comportamiento exacto (diagrama de clases)
 
-**DoR:** Sección 3 cerrada (o marcada como no aplica) con DoD cumplido.
+**DoR:** Sección 3.5 cerrada (o marcada como no aplica) con DoD cumplido.
 
 **Qué hago:**
 - Busco en `diagrama_codigo_completo.md` la(s) clase(s) de dominio involucradas en este RF.
