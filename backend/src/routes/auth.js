@@ -6,11 +6,14 @@ const pool = require('../config/db')
 
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
 
+// Almacenamiento temporal de registros pendientes
 const registrosPendientes = []
 
+// POST /auth/registro
 router.post('/registro', async (req, res) => {
   const { nombre, telefono, contrasena } = req.body
 
+  // Verificar si el teléfono ya está registrado en la DB
   const usuarioExistente = await pool.query('SELECT id FROM usuario WHERE telefono = $1', [telefono])
   if (usuarioExistente.rows.length > 0) {
     return res.status(400).json({ mensaje: 'El número de teléfono ya está registrado. Iniciá sesión o recuperá tu contraseña.' })
@@ -21,6 +24,7 @@ router.post('/registro', async (req, res) => {
   const expiracion = new Date(Date.now() + 10 * 60 * 1000)
   const contrasenaHash = await bcrypt.hash(contrasena, 10)
 
+  // Guardar en memoria temporalmente
   registrosPendientes.push({ nombre, telefono, contrasenaHash, codigo, expiracion })
 
   // Enviar SMS
@@ -36,9 +40,11 @@ router.post('/registro', async (req, res) => {
   })
 })
 
+// POST /auth/verificar
 router.post('/verificar', async (req, res) => {
   const { telefono, codigo } = req.body
 
+  // Buscar en memoria
   const pendiente = registrosPendientes.find(r => r.telefono === telefono && r.codigo === codigo)
 
   if (!pendiente) {
@@ -49,22 +55,26 @@ router.post('/verificar', async (req, res) => {
     return res.status(400).json({ mensaje: 'El código expiró. Solicitá uno nuevo.' })
   }
 
+  // Crear usuario en la DB
   const nuevoUsuario = await pool.query(
     'INSERT INTO usuario (nombre_completo, telefono, contrasena_hash, cuenta_verificada, consentimiento_datos_otorgado) VALUES ($1, $2, $3, $4, $5) RETURNING id',
     [pendiente.nombre, pendiente.telefono, pendiente.contrasenaHash, true, true]
   )
 
+  // Guardar código en la DB como registro histórico
   await pool.query(
     'INSERT INTO codigo_verificacion (usuario_id, codigo, proposito, fecha_expiracion, usado) VALUES ($1, $2, $3, $4, $5)',
     [nuevoUsuario.rows[0].id, pendiente.codigo, 'activacion_cuenta', pendiente.expiracion, true]
   )
 
+  // Eliminar de memoria
   const index = registrosPendientes.indexOf(pendiente)
   registrosPendientes.splice(index, 1)
 
   res.json({ mensaje: 'Cuenta activada correctamente.' })
 })
 
+// POST /auth/login
 router.post('/login', async (req, res) => {
   const { telefono, contrasena } = req.body
 
@@ -84,7 +94,6 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ mensaje: 'El teléfono o la contraseña son incorrectos.' })
   }
 
-  // Generar token JWT
   const token = require('jsonwebtoken').sign(
     { id: usuario.id, nombre: usuario.nombre_completo },
     process.env.JWT_SECRET,
@@ -93,4 +102,5 @@ router.post('/login', async (req, res) => {
 
   res.json({ mensaje: 'Sesión iniciada correctamente.', token, nombre: usuario.nombre_completo })
 })
+
 module.exports = router
