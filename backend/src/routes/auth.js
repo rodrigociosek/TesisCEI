@@ -74,4 +74,33 @@ router.post('/verificar', async (req, res) => {
   res.json({ mensaje: 'Cuenta activada correctamente.' })
 })
 
+// POST /auth/login
+router.post('/login', async (req, res) => {
+  const { telefono, contrasena } = req.body
+
+  const resultado = await pool.query('SELECT * FROM usuario WHERE telefono = $1', [telefono])
+  if (resultado.rows.length === 0) {
+    return res.status(400).json({ mensaje: 'No encontramos una cuenta con ese número de teléfono.' })
+  }
+
+  const usuario = resultado.rows[0]
+
+  if (!usuario.cuenta_verificada) {
+    return res.status(400).json({ mensaje: 'Tu cuenta aún no fue verificada. Revisá el SMS que te enviamos.' })
+  }
+
+  const contrasenaCorrecta = await bcrypt.compare(contrasena, usuario.contrasena_hash)
+  if (!contrasenaCorrecta) {
+    return res.status(400).json({ mensaje: 'El teléfono o la contraseña son incorrectos.' })
+  }
+
+  const token = require('jsonwebtoken').sign(
+    { id: usuario.id, nombre: usuario.nombre_completo },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
+  )
+
+  res.json({ mensaje: 'Sesión iniciada correctamente.', token, nombre: usuario.nombre_completo })
+})
+
 module.exports = router
