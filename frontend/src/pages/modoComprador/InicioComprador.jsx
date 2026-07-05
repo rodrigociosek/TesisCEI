@@ -11,7 +11,7 @@ function InicioComprador() {
     try {
       await axios.post('http://localhost:3000/auth/activarModoDistribuidor', { telefono })
       localStorage.setItem('modoDistribuidorActivo', 'true')
-      navigate('/Inicio')
+      navigate('/inicio')
     } catch (error) {
       alert(error.response.data.mensaje)
     }
