@@ -9,8 +9,6 @@ import Inicio from './pages/modoDistribuidor/Inicio'
 import FichaProducto from './pages/modoDistribuidor/FichaProducto'
 import InicioComprador from './pages/modoComprador/InicioComprador'
 
-
-
 function App() {
   return (
     <Routes>
@@ -23,7 +21,6 @@ function App() {
       <Route path='/inicio' element={<Inicio />} />
       <Route path='/producto/nuevo' element={<FichaProducto />} />
       <Route path='/inicioComprador' element={<InicioComprador />} />
-
     </Routes>
   )
 }
