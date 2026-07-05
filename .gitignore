@@ -1,11 +1,6 @@
 # Variables de entorno
 .env
 
-# Herramientas de desarrollo local (no van al repo compartido)
-docs/
-CLAUDE.md
-.claude/
-
 # Dependencias
 node_modules/
 dist/
