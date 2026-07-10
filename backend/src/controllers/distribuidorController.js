@@ -122,4 +122,26 @@ const subirLogo = async (req, res) => {
   }
 }
 
-module.exports = { obtenerPerfil, configurarPerfil, verificarPerfil, obtenerPerfilPropio, editarPerfil, subirLogo }
+const obtenerProductosPublicados = async (req, res) => {
+  try {
+    const { id } = req.params
+    const db = require('../config/db')
+
+    const productos = await db.query(
+      `SELECT p.id, p.nombre, p.descripcion, p.imagen_url AS "imagenUrl", c.nombre AS categoria
+       FROM producto p
+       JOIN categoria c ON c.id = p.categoria_id
+       WHERE p.distribuidor_id = $1 AND p.estado_visibilidad = 'publicado' AND p.habilitado = true
+       ORDER BY p.fecha_creacion DESC`,
+      [id]
+    )
+
+    res.json(productos.rows)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ mensaje: 'No fue posible completar la operación. Intente nuevamente más tarde.' })
+  }
+}
+
+
+module.exports = { obtenerPerfil, configurarPerfil, verificarPerfil, obtenerPerfilPropio, editarPerfil, subirLogo, obtenerProductosPublicados }
