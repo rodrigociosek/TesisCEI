@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import './FichaProducto.css'
 
@@ -7,6 +7,8 @@ const API = 'http://localhost:3000'
 
 function FichaProducto() {
   const navigate = useNavigate()
+  const { id: productoIdParam } = useParams()
+  const modoEdicion = Boolean(productoIdParam)
 
   // --- Estado del producto ---
   const [categorias, setCategorias] = useState([])
@@ -24,6 +26,7 @@ function FichaProducto() {
   const [metricaVisualizacion, setMetricaVisualizacion] = useState('')
   const [errorProducto, setErrorProducto] = useState('')
   const [cargandoProducto, setCargandoProducto] = useState(false)
+  const [cargandoDatos, setCargandoDatos] = useState(modoEdicion)
 
   // --- Estado del producto recién creado (para habilitar precios) ---
   const [productoId, setProductoId] = useState(null)
@@ -45,6 +48,29 @@ function FichaProducto() {
       .then(res => setCategorias(res.data))
       .catch(() => setErrorProducto('No se pudieron cargar las categorías.'))
   }, [])
+
+  // En modo edición: cargar datos actuales del producto
+  useEffect(() => {
+    if (!modoEdicion) return
+    setCargandoDatos(true)
+    axios.get(`${API}/api/productos/${productoIdParam}`, { headers })
+      .then(res => {
+        const p = res.data
+        setNombre(p.nombre || '')
+        setDescripcion(p.descripcion || '')
+        setCategoriaId(String(p.categoriaId))
+        setTipo(p.tipoProducto || '')
+        setStockInicial(String(p.stockTotal ?? ''))
+        setCantidadMinimaCompra(String(p.cantidadMinimaCompra ?? ''))
+        setDescripcionUnidadVenta(p.descripcionUnidadVenta || '')
+        setUnidadBaseInterna(p.unidadBaseInterna || '')
+        setIncrementoVenta(p.incrementoVenta != null ? String(p.incrementoVenta) : '')
+        setMetricaVisualizacion(p.metricaVisualizacion || '')
+        if (p.imagenUrl) setImagenPreview(`${API}${p.imagenUrl}`)
+      })
+      .catch(() => setErrorProducto('No se pudieron cargar los datos del producto.'))
+      .finally(() => setCargandoDatos(false))
+  }, [productoIdParam])
 
   const handleTipoChange = (nuevoTipo) => {
     setTipo(nuevoTipo)
@@ -117,6 +143,33 @@ function FichaProducto() {
     }
   }
 
+  const handleActualizarProducto = async () => {
+    setErrorProducto('')
+    setCargandoProducto(true)
+    try {
+      const formData = new FormData()
+      formData.append('nombre', nombre)
+      formData.append('descripcion', descripcion)
+      formData.append('categoriaId', categoriaId)
+      formData.append('tipoProducto', tipo)
+      formData.append('stockTotal', stockInicial)
+      formData.append('cantidadMinimaCompra', cantidadMinimaCompra)
+      if (tipo === 'empaquetado') formData.append('descripcionUnidadVenta', descripcionUnidadVenta)
+      if (tipo === 'fraccionable') {
+        formData.append('incrementoVenta', incrementoVenta)
+        formData.append('metricaVisualizacion', metricaVisualizacion)
+      }
+      if (imagenArchivo) formData.append('imagen', imagenArchivo)
+
+      await axios.put(`${API}/api/productos/${productoIdParam}`, formData, { headers })
+      navigate('/inicio')
+    } catch (err) {
+      setErrorProducto(err.response?.data?.error || 'No fue posible completar la operación. Intente nuevamente más tarde.')
+    } finally {
+      setCargandoProducto(false)
+    }
+  }
+
   const handleAgregarPrecio = async () => {
     setErrorPrecio('')
     setCargandoPrecio(true)
@@ -144,7 +197,7 @@ function FichaProducto() {
 
   const handleFinalizar = () => navigate('/inicio')
 
-  // Vista después de guardar el producto — sección de precios
+  // Vista después de guardar el producto (solo creación) — sección de precios
   if (productoId) {
     return (
       <div className="ficha-fondo">
@@ -175,7 +228,6 @@ function FichaProducto() {
                   )}
                 </div>
 
-                {/* Tabla de precios */}
                 <div className="ficha-precios-tabla">
                   <div className="ficha-precios-thead">
                     <div>Cant. mínima</div>
@@ -202,7 +254,6 @@ function FichaProducto() {
                   ))}
                 </div>
 
-                {/* Formulario inline para agregar precio */}
                 {mostrarFormPrecio && (
                   <div className="ficha-form-precio">
                     <div className="ficha-fila-tres">
@@ -276,7 +327,11 @@ function FichaProducto() {
     )
   }
 
-  // Vista inicial — formulario de creación del producto
+  if (cargandoDatos) {
+    return <div className="ficha-fondo"><div className="ficha-contenedor">Cargando...</div></div>
+  }
+
+  // Vista formulario (creación o edición)
   return (
     <div className="ficha-fondo">
       <div className="ficha-contenedor">
@@ -284,7 +339,7 @@ function FichaProducto() {
         <div className="ficha-breadcrumb">
           <span className="ficha-breadcrumb-link" onClick={() => navigate('/inicio')}>Mis productos</span>
           <span className="ficha-breadcrumb-sep">›</span>
-          <span>Nuevo producto</span>
+          <span>{modoEdicion ? 'Editar producto' : 'Nuevo producto'}</span>
         </div>
 
         <div className="ficha-layout">
@@ -403,7 +458,7 @@ function FichaProducto() {
               )}
 
               <div className="ficha-campo">
-                <label className="ficha-label">Stock inicial <span className="ficha-requerido">*</span></label>
+                <label className="ficha-label">Stock {modoEdicion ? 'actual' : 'inicial'} <span className="ficha-requerido">*</span></label>
                 <input type="number" className="ficha-input ficha-input-angosto" min="0" value={stockInicial} onChange={e => setStockInicial(e.target.value)} placeholder="0" />
                 <span className="ficha-ayuda">No puede reducirse por debajo del stock reservado.</span>
               </div>
@@ -414,14 +469,20 @@ function FichaProducto() {
           </div>
 
           <div className="ficha-sidebar">
-            <div className="ficha-card ficha-card-estado">
-              <div className="ficha-sidebar-titulo">Estado</div>
-              <div className="ficha-estado-texto">Pausado</div>
-              <span className="ficha-estado-nota">El producto se crea pausado. Publicalo una vez que tenga precios.</span>
-            </div>
+            {!modoEdicion && (
+              <div className="ficha-card ficha-card-estado">
+                <div className="ficha-sidebar-titulo">Estado</div>
+                <div className="ficha-estado-texto">Pausado</div>
+                <span className="ficha-estado-nota">El producto se crea pausado. Publicalo una vez que tenga precios.</span>
+              </div>
+            )}
             <div className="ficha-card">
-              <button className="ficha-btn-guardar" onClick={handleGuardarProducto} disabled={cargandoProducto}>
-                {cargandoProducto ? 'Guardando…' : 'Guardar producto'}
+              <button
+                className="ficha-btn-guardar"
+                onClick={modoEdicion ? handleActualizarProducto : handleGuardarProducto}
+                disabled={cargandoProducto}
+              >
+                {cargandoProducto ? 'Guardando…' : (modoEdicion ? 'Guardar cambios' : 'Guardar producto')}
               </button>
               <button className="ficha-btn-cancelar" onClick={() => navigate('/inicio')} disabled={cargandoProducto}>
                 Cancelar
