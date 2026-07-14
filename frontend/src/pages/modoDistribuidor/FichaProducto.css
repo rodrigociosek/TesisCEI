@@ -437,3 +437,64 @@
     flex-direction: column;
   }
 }
+
+.ficha-card-peligro {
+  border: 1px solid #e4e4e4;
+  border-radius: 6px;
+  padding: 16px;
+  background: #fff;
+}
+
+.ficha-peligro-titulo {
+  font-size: 11px;
+  color: #aaa;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ficha-btn-eliminar {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ficha-btn-eliminar:hover {
+  border-color: #c00;
+  color: #c00;
+}
+
+.ficha-btn-eliminar-confirmar {
+  width: 100%;
+  height: 36px;
+  border: none;
+  border-radius: 4px;
+  background: #c00;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.ficha-btn-eliminar-confirmar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ficha-confirmar-texto {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.ficha-eliminar-mensaje {
+  font-size: 12px;
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
