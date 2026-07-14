@@ -186,7 +186,7 @@ function Inicio() {
                       <span className="panel-accion-link" onClick={() => handleCambiarVisibilidad(p.id, 'publicado')}>Publicar</span>
                     )}
                     {' · '}
-                    <span className="panel-accion-link">Editar</span>
+                    <span className="panel-accion-link" onClick={() => navigate(`/producto/${p.id}/editar`)}>Editar</span>
                   </div>
                 </div>
                 {errorVisibilidad[p.id] && (
