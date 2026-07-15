@@ -306,9 +306,6 @@ async function eliminarOdeshabilitar(productoId, usuarioId) {
     throw error
   }
 
-  // Eliminar precios asociados y luego el producto
-  // Nota: cuando existan las tablas pedido_item / propuesta_sustitucion / pedido_reposicion_item
-  // agregar verificación aquí y pasar a deshabilitar en vez de eliminar si hay registros asociados.
   await pool.query('DELETE FROM precio_volumen WHERE producto_id = $1', [productoId])
   await pool.query('DELETE FROM producto WHERE id = $1', [productoId])
   return { tipoResultado: 'ELIMINADO_FISICAMENTE', mensaje: 'El producto fue eliminado correctamente.' }
