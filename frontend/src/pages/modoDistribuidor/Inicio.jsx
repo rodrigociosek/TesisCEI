@@ -13,6 +13,15 @@ const NAV_ITEMS = [
   { label: 'Configuración', ruta: '/configuracion' },
 ]
 
+function sufijoPorTipo(tipoProducto, metricaVisualizacion) {
+  if (tipoProducto === 'fraccionable') {
+    if (metricaVisualizacion === 'kilogramos') return 'kg'
+    if (metricaVisualizacion === 'litros') return 'L'
+    if (metricaVisualizacion === 'metros') return 'm'
+  }
+  return 'u.'
+}
+
 function Inicio() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -170,10 +179,15 @@ function Inicio() {
                   </div>
                   <div className="panel-tabla-celda">{p.nombre}</div>
                   <div className="panel-tabla-celda">{p.categoria}</div>
-                  <div className={`panel-tabla-celda${p.stockDisponible === 0 ? ' stock-cero' : ''}`}>
-                    {p.stockDisponible} u.
+                  <div className="panel-tabla-celda">
+                    {p.stockDisponible === 0
+                      ? <span className="panel-stock-sin-disponible">Sin stock disp.</span>
+                      : `${p.stockDisponible} ${sufijoPorTipo(p.tipoProducto, p.metricaVisualizacion)}`
+                    }
                   </div>
-                  <div className="panel-tabla-celda">{p.stockReservado} u.</div>
+                  <div className="panel-tabla-celda">
+                    {p.stockReservado} {sufijoPorTipo(p.tipoProducto, p.metricaVisualizacion)}
+                  </div>
                   <div className="panel-tabla-celda">
                     <span className={`panel-estado-badge ${p.estadoVisibilidad}`}>
                       {p.estadoVisibilidad === 'publicado' ? 'Publicado' : 'Pausado'}
