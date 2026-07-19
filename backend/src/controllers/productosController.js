@@ -78,4 +78,42 @@ async function cambiarVisibilidad(req, res, next) {
   }
 }
 
-module.exports = { listarCategorias, crearProducto, listarProductos, cambiarVisibilidad }
+async function obtenerProducto(req, res, next) {
+  const productoId = Number(req.params.id)
+  try {
+    const producto = await productosServicio.obtenerProducto(productoId, req.usuario.id)
+    res.status(200).json(producto)
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.mensaje })
+    next(error)
+  }
+}
+
+async function editarProducto(req, res, next) {
+  const productoId = Number(req.params.id)
+  const imagenUrl = req.file ? `/uploads/${req.file.filename}` : undefined
+  const datos = { ...req.body, imagenUrl }
+  if (datos.stockTotal !== undefined) datos.stockTotal = Number(datos.stockTotal)
+  if (datos.cantidadMinimaCompra !== undefined) datos.cantidadMinimaCompra = Number(datos.cantidadMinimaCompra)
+  if (datos.incrementoVenta !== undefined) datos.incrementoVenta = datos.incrementoVenta ? Number(datos.incrementoVenta) : null
+  try {
+    const producto = await productosServicio.editarProducto(productoId, req.usuario.id, datos)
+    res.status(200).json({ mensaje: 'Producto actualizado correctamente.', producto })
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.mensaje })
+    next(error)
+  }
+}
+
+async function eliminarProducto(req, res, next) {
+  const productoId = Number(req.params.id)
+  try {
+    const resultado = await productosServicio.eliminarOdeshabilitar(productoId, req.usuario.id)
+    res.status(200).json(resultado)
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.mensaje })
+    next(error)
+  }
+}
+
+module.exports = { listarCategorias, crearProducto, listarProductos, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarProducto }

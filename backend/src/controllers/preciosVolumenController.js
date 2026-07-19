@@ -32,4 +32,18 @@ async function registrarPrecio(req, res, next) {
   }
 }
 
-module.exports = { listarPrecios, registrarPrecio }
+async function eliminarPrecio(req, res, next) {
+  try {
+    await preciosVolumenServicio.eliminarPrecio(
+      Number(req.params.productoId),
+      Number(req.params.precioId),
+      req.usuario.id
+    )
+    res.status(200).json({ mensaje: 'Precio eliminado correctamente.' })
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.mensaje })
+    next(error)
+  }
+}
+
+module.exports = { listarPrecios, registrarPrecio, eliminarPrecio }
