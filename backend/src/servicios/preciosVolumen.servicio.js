@@ -64,4 +64,38 @@ async function registrarPrecio(productoId, usuarioId, datos) {
   return res.rows[0]
 }
 
-module.exports = { listarPrecios, registrarPrecio }
+async function editarPrecio(productoId, precioId, usuarioId, datos) {
+  const { cantidadMinima, precioVenta, precioCosto } = datos
+  validarDatos(precioVenta, precioCosto, cantidadMinima)
+  await verificarProductoDelDistribuidor(productoId, usuarioId)
+  const res = await pool.query(
+    `UPDATE precio_volumen SET cantidad_minima = $1, precio_venta = $2, precio_costo = $3
+     WHERE id = $4 AND producto_id = $5
+     RETURNING id, cantidad_minima AS "cantidadMinima",
+               precio_venta AS "precioVenta", precio_costo AS "precioCosto"`,
+    [cantidadMinima, precioVenta, precioCosto ?? null, precioId, productoId]
+  )
+  if (res.rows.length === 0) {
+    const e = new Error()
+    e.status = 404
+    e.mensaje = 'Precio no encontrado.'
+    throw e
+  }
+  return res.rows[0]
+}
+
+async function eliminarPrecio(productoId, precioId, usuarioId) {
+  await verificarProductoDelDistribuidor(productoId, usuarioId)
+  const res = await pool.query(
+    'DELETE FROM precio_volumen WHERE id = $1 AND producto_id = $2 RETURNING id',
+    [precioId, productoId]
+  )
+  if (res.rows.length === 0) {
+    const e = new Error()
+    e.status = 404
+    e.mensaje = 'Precio no encontrado.'
+    throw e
+  }
+}
+
+module.exports = { listarPrecios, registrarPrecio, editarPrecio, eliminarPrecio }
