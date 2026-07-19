@@ -93,6 +93,12 @@ async function crearProducto(usuarioId, datos) {
   return resultado.rows[0]
 }
 
+function convertirAUnidadVisualizacion(cantidad, unidadBase) {
+  if (unidadBase === 'gramo' || unidadBase === 'mililitro') return Math.round(cantidad / 1000 * 1000) / 1000
+  if (unidadBase === 'centimetro') return Math.round(cantidad / 100 * 1000) / 1000
+  return cantidad
+}
+
 async function listarProductos(usuarioId) {
   const resultado = await pool.query(
     `SELECT
@@ -100,10 +106,12 @@ async function listarProductos(usuarioId) {
        p.nombre,
        p.imagen_url AS "imagenUrl",
        c.nombre AS categoria,
-       (p.stock_total - p.stock_reservado) AS "stockDisponible",
+       p.tipo_producto AS "tipoProducto",
+       p.stock_total AS "stockTotal",
        p.stock_reservado AS "stockReservado",
-       p.estado_visibilidad AS "estadoVisibilidad",
-       p.tipo_producto AS "tipoProducto"
+       p.unidad_base_interna AS "unidadBaseInterna",
+       p.metrica_visualizacion AS "metricaVisualizacion",
+       p.estado_visibilidad AS "estadoVisibilidad"
      FROM producto p
      JOIN categoria c ON c.id = p.categoria_id
      JOIN distribuidor d ON d.id = p.distribuidor_id
@@ -111,7 +119,21 @@ async function listarProductos(usuarioId) {
      ORDER BY p.fecha_creacion DESC`,
     [usuarioId]
   )
-  return resultado.rows
+  return resultado.rows.map(p => {
+    const disponibleCrudo = p.stockTotal - p.stockReservado
+    const esFraccionable = p.tipoProducto === 'fraccionable'
+    return {
+      id: p.id,
+      nombre: p.nombre,
+      imagenUrl: p.imagenUrl,
+      categoria: p.categoria,
+      tipoProducto: p.tipoProducto,
+      metricaVisualizacion: p.metricaVisualizacion,
+      stockDisponible: esFraccionable ? convertirAUnidadVisualizacion(disponibleCrudo, p.unidadBaseInterna) : disponibleCrudo,
+      stockReservado: esFraccionable ? convertirAUnidadVisualizacion(p.stockReservado, p.unidadBaseInterna) : p.stockReservado,
+      estadoVisibilidad: p.estadoVisibilidad,
+    }
+  })
 }
 
 async function cambiarVisibilidad(productoId, usuarioId, nuevoEstado) {
