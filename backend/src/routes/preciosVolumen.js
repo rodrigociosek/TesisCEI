@@ -5,6 +5,7 @@ const preciosVolumenController = require('../controllers/preciosVolumenControlle
 
 router.get('/', verificarToken, preciosVolumenController.listarPrecios)
 router.post('/', verificarToken, preciosVolumenController.registrarPrecio)
+router.put('/:precioId', verificarToken, preciosVolumenController.editarPrecio)
 router.delete('/:precioId', verificarToken, preciosVolumenController.eliminarPrecio)
 
 module.exports = router

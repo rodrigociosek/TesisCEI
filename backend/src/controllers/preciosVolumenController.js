@@ -32,6 +32,26 @@ async function registrarPrecio(req, res, next) {
   }
 }
 
+async function editarPrecio(req, res, next) {
+  const { cantidadMinima, precioVenta, precioCosto } = req.body
+  try {
+    const precio = await preciosVolumenServicio.editarPrecio(
+      Number(req.params.productoId),
+      Number(req.params.precioId),
+      req.usuario.id,
+      {
+        cantidadMinima: Number(cantidadMinima),
+        precioVenta: Number(precioVenta),
+        precioCosto: precioCosto !== undefined && precioCosto !== '' ? Number(precioCosto) : null,
+      }
+    )
+    res.status(200).json({ mensaje: 'Precio actualizado correctamente.', precio })
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.mensaje })
+    next(error)
+  }
+}
+
 async function eliminarPrecio(req, res, next) {
   try {
     await preciosVolumenServicio.eliminarPrecio(
@@ -46,4 +66,4 @@ async function eliminarPrecio(req, res, next) {
   }
 }
 
-module.exports = { listarPrecios, registrarPrecio, eliminarPrecio }
+module.exports = { listarPrecios, registrarPrecio, editarPrecio, eliminarPrecio }
