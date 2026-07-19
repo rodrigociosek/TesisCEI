@@ -93,47 +93,51 @@ async function crearProducto(usuarioId, datos) {
   return resultado.rows[0]
 }
 
-function convertirAUnidadVisualizacion(cantidad, unidadBase) {
-  if (unidadBase === 'gramo' || unidadBase === 'mililitro') return Math.round(cantidad / 1000 * 1000) / 1000
-  if (unidadBase === 'centimetro') return Math.round(cantidad / 100 * 1000) / 1000
-  return cantidad
-}
+async function listarProductos(usuarioId, filtros = {}) {
+  const { categoria, visibilidad, stock } = filtros
 
-async function listarProductos(usuarioId) {
+  let condiciones = ['d.usuario_id = $1', 'p.habilitado = true']
+  let params = [usuarioId]
+  let contador = 2
+
+  if (categoria) {
+    condiciones.push(`c.nombre = $${contador}`)
+    params.push(categoria)
+    contador++
+  }
+
+  if (visibilidad) {
+    condiciones.push(`p.estado_visibilidad = $${contador}`)
+    params.push(visibilidad)
+    contador++
+  }
+
+  if (stock === 'con_stock') {
+    condiciones.push(`(p.stock_total - p.stock_reservado) > 0`)
+  } else if (stock === 'sin_stock') {
+    condiciones.push(`(p.stock_total - p.stock_reservado) = 0`)
+  }
+
+  const where = condiciones.join(' AND ')
+
   const resultado = await pool.query(
     `SELECT
        p.id,
        p.nombre,
        p.imagen_url AS "imagenUrl",
        c.nombre AS categoria,
-       p.tipo_producto AS "tipoProducto",
-       p.stock_total AS "stockTotal",
+       (p.stock_total - p.stock_reservado) AS "stockDisponible",
        p.stock_reservado AS "stockReservado",
-       p.unidad_base_interna AS "unidadBaseInterna",
-       p.metrica_visualizacion AS "metricaVisualizacion",
-       p.estado_visibilidad AS "estadoVisibilidad"
+       p.estado_visibilidad AS "estadoVisibilidad",
+       p.tipo_producto AS "tipoProducto"
      FROM producto p
      JOIN categoria c ON c.id = p.categoria_id
      JOIN distribuidor d ON d.id = p.distribuidor_id
-     WHERE d.usuario_id = $1 AND p.habilitado = true
+     WHERE ${where}
      ORDER BY p.fecha_creacion DESC`,
-    [usuarioId]
+    params
   )
-  return resultado.rows.map(p => {
-    const disponibleCrudo = p.stockTotal - p.stockReservado
-    const esFraccionable = p.tipoProducto === 'fraccionable'
-    return {
-      id: p.id,
-      nombre: p.nombre,
-      imagenUrl: p.imagenUrl,
-      categoria: p.categoria,
-      tipoProducto: p.tipoProducto,
-      metricaVisualizacion: p.metricaVisualizacion,
-      stockDisponible: esFraccionable ? convertirAUnidadVisualizacion(disponibleCrudo, p.unidadBaseInterna) : disponibleCrudo,
-      stockReservado: esFraccionable ? convertirAUnidadVisualizacion(p.stockReservado, p.unidadBaseInterna) : p.stockReservado,
-      estadoVisibilidad: p.estadoVisibilidad,
-    }
-  })
+  return resultado.rows
 }
 
 async function cambiarVisibilidad(productoId, usuarioId, nuevoEstado) {
@@ -182,155 +186,4 @@ async function cambiarVisibilidad(productoId, usuarioId, nuevoEstado) {
   return resultado.rows[0]
 }
 
-async function editarProducto(productoId, usuarioId, datos) {
-  const {
-    nombre,
-    descripcion,
-    imagenUrl,
-    categoriaId,
-    cantidadMinimaCompra,
-    descripcionUnidadVenta,
-    incrementoVenta,
-    metricaVisualizacion,
-    stockTotal,
-    tipoProducto,
-  } = datos
-
-  if (!nombre || nombre.trim() === '') {
-    const error = new Error()
-    error.status = 400
-    error.mensaje = 'El nombre del producto es obligatorio.'
-    throw error
-  }
-
-  // Verificar que el producto pertenece al distribuidor
-  const perteneceRes = await pool.query(
-    `SELECT p.id, p.tipo_producto, p.stock_reservado
-     FROM producto p
-     JOIN distribuidor d ON d.id = p.distribuidor_id
-     WHERE p.id = $1 AND d.usuario_id = $2 AND p.habilitado = true`,
-    [productoId, usuarioId]
-  )
-  if (perteneceRes.rows.length === 0) {
-    const error = new Error()
-    error.status = 404
-    error.mensaje = 'Producto no encontrado.'
-    throw error
-  }
-
-  const actual = perteneceRes.rows[0]
-
-  // Regla: tipo_producto no puede modificarse si hay pedidos registrados
-  if (tipoProducto && tipoProducto !== actual.tipo_producto) {
-    const pedidosRes = await pool.query(
-      'SELECT 1 FROM pedido_item WHERE producto_id = $1 LIMIT 1',
-      [productoId]
-    )
-    if (pedidosRes.rows.length > 0) {
-      const error = new Error()
-      error.status = 422
-      error.mensaje = 'El tipo de producto no puede modificarse cuando el producto tiene pedidos registrados.'
-      throw error
-    }
-  }
-
-  // Regla: stock no puede reducirse por debajo del stock reservado
-  if (stockTotal !== undefined && stockTotal < actual.stock_reservado) {
-    const error = new Error()
-    error.status = 422
-    error.mensaje = 'No es posible reducir el stock por debajo de las unidades reservadas en pedidos activos.'
-    throw error
-  }
-
-  const tipoFinal = tipoProducto || actual.tipo_producto
-
-  const resultado = await pool.query(
-    `UPDATE producto SET
-       nombre = $1,
-       descripcion = $2,
-       imagen_url = COALESCE($3, imagen_url),
-       categoria_id = $4,
-       cantidad_minima_compra = $5,
-       descripcion_unidad_venta = $6,
-       incremento_venta = $7,
-       metrica_visualizacion = $8,
-       stock_total = $9,
-       tipo_producto = $10
-     WHERE id = $11
-     RETURNING
-       id,
-       nombre,
-       tipo_producto AS "tipoProducto",
-       estado_visibilidad AS "estadoVisibilidad",
-       stock_total AS "stockTotal",
-       stock_reservado AS "stockReservado"`,
-    [
-      nombre.trim(),
-      descripcion || null,
-      imagenUrl || null,
-      categoriaId,
-      cantidadMinimaCompra,
-      tipoFinal === 'empaquetado' ? (descripcionUnidadVenta || null) : null,
-      tipoFinal === 'fraccionable' ? (incrementoVenta || null) : null,
-      tipoFinal === 'fraccionable' ? (metricaVisualizacion || null) : null,
-      stockTotal !== undefined ? stockTotal : null,
-      tipoFinal,
-      productoId,
-    ]
-  )
-
-  return resultado.rows[0]
-}
-
-async function obtenerProducto(productoId, usuarioId) {
-  const resultado = await pool.query(
-    `SELECT
-       p.id,
-       p.nombre,
-       p.descripcion,
-       p.imagen_url AS "imagenUrl",
-       p.categoria_id AS "categoriaId",
-       p.tipo_producto AS "tipoProducto",
-       p.estado_visibilidad AS "estadoVisibilidad",
-       p.descripcion_unidad_venta AS "descripcionUnidadVenta",
-       p.cantidad_minima_compra AS "cantidadMinimaCompra",
-       p.unidad_base_interna AS "unidadBaseInterna",
-       p.incremento_venta AS "incrementoVenta",
-       p.metrica_visualizacion AS "metricaVisualizacion",
-       p.stock_total AS "stockTotal",
-       p.stock_reservado AS "stockReservado"
-     FROM producto p
-     JOIN distribuidor d ON d.id = p.distribuidor_id
-     WHERE p.id = $1 AND d.usuario_id = $2 AND p.habilitado = true`,
-    [productoId, usuarioId]
-  )
-  if (resultado.rows.length === 0) {
-    const error = new Error()
-    error.status = 404
-    error.mensaje = 'Producto no encontrado.'
-    throw error
-  }
-  return resultado.rows[0]
-}
-
-async function eliminarOdeshabilitar(productoId, usuarioId) {
-  // Verificar que el producto pertenece al distribuidor
-  const perteneceRes = await pool.query(
-    `SELECT p.id FROM producto p
-     JOIN distribuidor d ON d.id = p.distribuidor_id
-     WHERE p.id = $1 AND d.usuario_id = $2 AND p.habilitado = true`,
-    [productoId, usuarioId]
-  )
-  if (perteneceRes.rows.length === 0) {
-    const error = new Error()
-    error.status = 404
-    error.mensaje = 'Producto no encontrado.'
-    throw error
-  }
-
-  await pool.query('DELETE FROM precio_volumen WHERE producto_id = $1', [productoId])
-  await pool.query('DELETE FROM producto WHERE id = $1', [productoId])
-  return { tipoResultado: 'ELIMINADO_FISICAMENTE', mensaje: 'El producto fue eliminado correctamente.' }
-}
-
-module.exports = { obtenerCategorias, validarDatosCreacion, crearProducto, listarProductos, cambiarVisibilidad, editarProducto, obtenerProducto, eliminarOdeshabilitar }
+module.exports = { obtenerCategorias, validarDatosCreacion, crearProducto, listarProductos, cambiarVisibilidad }

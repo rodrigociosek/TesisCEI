@@ -10,17 +10,8 @@ const NAV_ITEMS = [
   { label: 'Reparto', ruta: '/reparto' },
   { label: 'Reportes', ruta: '/reportes' },
   { label: 'Empleados', ruta: '/empleados' },
-  { label: 'Configuración', ruta: '/configuracion' },
+  { label: 'Editar perfil', ruta: '/editarPerfil' },
 ]
-
-function sufijoPorTipo(tipoProducto, metricaVisualizacion) {
-  if (tipoProducto === 'fraccionable') {
-    if (metricaVisualizacion === 'kilogramos') return 'kg'
-    if (metricaVisualizacion === 'litros') return 'L'
-    if (metricaVisualizacion === 'metros') return 'm'
-  }
-  return 'u.'
-}
 
 function Inicio() {
   const navigate = useNavigate()
@@ -30,18 +21,59 @@ function Inicio() {
 
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
-  const [errorVisibilidad, setErrorVisibilidad] = useState({}) // { [productoId]: mensaje }
+  const [errorVisibilidad, setErrorVisibilidad] = useState({})
+  const [categorias, setCategorias] = useState([])
+  const [filtroCategoria, setFiltroCategoria] = useState('')
+  const [filtroVisibilidad, setFiltroVisibilidad] = useState('')
+  const [filtroStock, setFiltroStock] = useState('')
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
 
+  const cargarProductos = async (categoria = '', visibilidad = '', stock = '') => {
+    setCargando(true)
+    try {
+      const params = {}
+      if (categoria) params.categoria = categoria
+      if (visibilidad) params.visibilidad = visibilidad
+      if (stock) params.stock = stock
+      const res = await axios.get('http://localhost:3000/api/productos', { headers, params })
+      setProductos(res.data)
+    } catch {
+      setProductos([])
+    } finally {
+      setCargando(false)
+    }
+  }
+
   useEffect(() => {
-    axios
-      .get('http://localhost:3000/api/productos', { headers })
-      .then(res => setProductos(res.data))
+    cargarProductos()
+    axios.get('http://localhost:3000/api/productos/categorias', { headers })
+      .then(res => setCategorias(res.data))
       .catch(() => {})
-      .finally(() => setCargando(false))
   }, [])
+
+  const filtrarPorCategoria = (e) => {
+    setFiltroCategoria(e.target.value)
+    cargarProductos(e.target.value, filtroVisibilidad, filtroStock)
+  }
+
+  const filtrarPorVisibilidad = (e) => {
+    setFiltroVisibilidad(e.target.value)
+    cargarProductos(filtroCategoria, e.target.value, filtroStock)
+  }
+
+  const filtrarPorStock = (e) => {
+    setFiltroStock(e.target.value)
+    cargarProductos(filtroCategoria, filtroVisibilidad, e.target.value)
+  }
+
+  const limpiarFiltros = () => {
+    setFiltroCategoria('')
+    setFiltroVisibilidad('')
+    setFiltroStock('')
+    cargarProductos()
+  }
 
   const handleCambiarVisibilidad = async (productoId, nuevoEstado) => {
     setErrorVisibilidad(prev => ({ ...prev, [productoId]: null }))
@@ -72,7 +104,6 @@ function Inicio() {
   return (
     <div className="panel-layout">
 
-      {/* Sidebar */}
       <aside className="panel-sidebar">
         <div className="panel-sidebar-marca">
           <div className="panel-sidebar-titulo">MarketDist</div>
@@ -90,7 +121,6 @@ function Inicio() {
             </div>
           ))}
           <button className='panel-nav-item' onClick={() => navigate('/inicioComprador')}>Cambiar a modo comprador</button>
-
         </nav>
 
         <div className="panel-sidebar-footer">
@@ -105,41 +135,48 @@ function Inicio() {
         </div>
       </aside>
 
-      {/* Contenido principal */}
       <main className="panel-main">
 
-        {/* Topbar */}
         <header className="panel-topbar">
           <span className="panel-topbar-titulo">Panel del Distribuidor</span>
           <div className="panel-avatar">{iniciales}</div>
         </header>
 
-        {/* Área de contenido */}
         <div className="panel-contenido">
 
-          {/* Encabezado sección */}
           <div className="panel-seccion-header">
             <div>
               <h1 className="panel-h1">Mis productos</h1>
               <p className="panel-subtitulo">Gestioná el catálogo de tu distribuidora.</p>
             </div>
-            <button
-              className="panel-btn-nuevo"
-              onClick={() => navigate('/producto/nuevo')}
-            >
+            <button className="panel-btn-nuevo" onClick={() => navigate('/producto/nuevo')}>
               + Nuevo producto
             </button>
           </div>
 
-          {/* Filtros */}
           <div className="panel-filtros">
-            <div className="panel-filtro-chip">Categoría ▾</div>
-            <div className="panel-filtro-chip">Visibilidad ▾</div>
-            <div className="panel-filtro-chip">Stock ▾</div>
-            <div className="panel-filtro-limpiar">Limpiar filtros</div>
+            <select className="panel-filtro-chip" value={filtroCategoria} onChange={filtrarPorCategoria}>
+              <option value=''>Categoría</option>
+              {categorias.map(c => (
+                <option key={c.id} value={c.nombre}>{c.nombre}</option>
+              ))}
+            </select>
+
+            <select className="panel-filtro-chip" value={filtroVisibilidad} onChange={filtrarPorVisibilidad}>
+              <option value=''>Visibilidad</option>
+              <option value='publicado'>Publicado</option>
+              <option value='pausado'>Pausado</option>
+            </select>
+
+            <select className="panel-filtro-chip" value={filtroStock} onChange={filtrarPorStock}>
+              <option value=''>Stock</option>
+              <option value='con_stock'>Con stock</option>
+              <option value='sin_stock'>Sin stock</option>
+            </select>
+
+            <div className="panel-filtro-limpiar" onClick={limpiarFiltros}>Limpiar filtros</div>
           </div>
 
-          {/* Tabla */}
           <div className="panel-tabla-wrapper">
             <div className="panel-tabla-header">
               <div></div>
@@ -157,14 +194,13 @@ function Inicio() {
 
             {!cargando && productos.length === 0 && (
               <div className="panel-tabla-vacio">
-                Aún no tenés productos. Creá el primero con el botón{' '}
-                <span
-                  className="panel-tabla-vacio-link"
-                  onClick={() => navigate('/producto/nuevo')}
-                >
-                  + Nuevo producto
-                </span>
-                .
+                {filtroCategoria || filtroVisibilidad || filtroStock
+                  ? 'No hay productos que coincidan con los filtros aplicados.'
+                  : <>Aún no tenés productos. Creá el primero con el botón{' '}
+                    <span className="panel-tabla-vacio-link" onClick={() => navigate('/producto/nuevo')}>
+                      + Nuevo producto
+                    </span>.</>
+                }
               </div>
             )}
 
@@ -179,15 +215,10 @@ function Inicio() {
                   </div>
                   <div className="panel-tabla-celda">{p.nombre}</div>
                   <div className="panel-tabla-celda">{p.categoria}</div>
-                  <div className="panel-tabla-celda">
-                    {p.stockDisponible === 0
-                      ? <span className="panel-stock-sin-disponible">Sin stock disp.</span>
-                      : `${p.stockDisponible} ${sufijoPorTipo(p.tipoProducto, p.metricaVisualizacion)}`
-                    }
+                  <div className={`panel-tabla-celda${p.stockDisponible === 0 ? ' stock-cero' : ''}`}>
+                    {p.stockDisponible} u.
                   </div>
-                  <div className="panel-tabla-celda">
-                    {p.stockReservado} {sufijoPorTipo(p.tipoProducto, p.metricaVisualizacion)}
-                  </div>
+                  <div className="panel-tabla-celda">{p.stockReservado} u.</div>
                   <div className="panel-tabla-celda">
                     <span className={`panel-estado-badge ${p.estadoVisibilidad}`}>
                       {p.estadoVisibilidad === 'publicado' ? 'Publicado' : 'Pausado'}
@@ -200,7 +231,7 @@ function Inicio() {
                       <span className="panel-accion-link" onClick={() => handleCambiarVisibilidad(p.id, 'publicado')}>Publicar</span>
                     )}
                     {' · '}
-                    <span className="panel-accion-link" onClick={() => navigate(`/producto/${p.id}/editar`)}>Editar</span>
+                    <span className="panel-accion-link">Editar</span>
                   </div>
                 </div>
                 {errorVisibilidad[p.id] && (
