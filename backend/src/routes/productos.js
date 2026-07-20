@@ -10,6 +10,7 @@ router.post('/', verificarToken, upload.single('imagen'), productosController.cr
 router.get('/:id', verificarToken, productosController.obtenerProducto)
 router.put('/:id', verificarToken, upload.single('imagen'), productosController.editarProducto)
 router.patch('/:id/visibilidad', verificarToken, productosController.cambiarVisibilidad)
+router.patch('/:id/umbral', verificarToken, productosController.configurarUmbral)
 router.delete('/:id', verificarToken, productosController.eliminarProducto)
 
 module.exports = router

@@ -223,7 +223,8 @@ async function obtenerProducto(productoId, usuarioId) {
        p.incremento_venta AS "incrementoVenta",
        p.metrica_visualizacion AS "metricaVisualizacion",
        p.stock_total AS "stockTotal",
-       p.stock_reservado AS "stockReservado"
+       p.stock_reservado AS "stockReservado",
+       p.umbral_minimo_stock AS "umbralMinimoStock"
      FROM producto p
      JOIN distribuidor d ON d.id = p.distribuidor_id
      WHERE p.id = $1 AND d.usuario_id = $2 AND p.habilitado = true`,
@@ -312,4 +313,34 @@ async function eliminarOdeshabilitar(productoId, usuarioId) {
   return { tipoResultado: 'ELIMINADO_FISICAMENTE', mensaje: 'El producto fue eliminado correctamente.' }
 }
 
-module.exports = { obtenerCategorias, validarDatosCreacion, crearProducto, listarProductos, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarOdeshabilitar }
+async function configurarUmbralMinimo(productoId, usuarioId, valor) {
+  if (valor < 0) {
+    const error = new Error()
+    error.status = 400
+    error.mensaje = 'El umbral mínimo no puede ser negativo.'
+    throw error
+  }
+
+  const perteneceRes = await pool.query(
+    `SELECT p.id FROM producto p
+     JOIN distribuidor d ON d.id = p.distribuidor_id
+     WHERE p.id = $1 AND d.usuario_id = $2 AND p.habilitado = true`,
+    [productoId, usuarioId]
+  )
+  if (perteneceRes.rows.length === 0) {
+    const error = new Error()
+    error.status = 404
+    error.mensaje = 'Producto no encontrado.'
+    throw error
+  }
+
+  const resultado = await pool.query(
+    `UPDATE producto SET umbral_minimo_stock = $1
+     WHERE id = $2
+     RETURNING id, umbral_minimo_stock AS "umbralMinimoStock"`,
+    [valor, productoId]
+  )
+  return resultado.rows[0]
+}
+
+module.exports = { obtenerCategorias, validarDatosCreacion, crearProducto, listarProductos, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarOdeshabilitar, configurarUmbralMinimo }
