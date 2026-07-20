@@ -1,4 +1,4 @@
-const productosServicio = require('../servicios/productos.servicio')
+const productosServicio = require('../services/productos.servicio')
 
 async function listarCategorias(req, res, next) {
   try {
@@ -116,4 +116,19 @@ async function eliminarProducto(req, res, next) {
   }
 }
 
-module.exports = { listarCategorias, crearProducto, listarProductos, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarProducto }
+async function configurarUmbral(req, res, next) {
+  const productoId = Number(req.params.id)
+  const valor = Number(req.body.valor)
+  if (isNaN(valor)) {
+    return res.status(400).json({ error: 'El umbral mínimo no puede ser negativo.' })
+  }
+  try {
+    const producto = await productosServicio.configurarUmbralMinimo(productoId, req.usuario.id, valor)
+    res.status(200).json({ mensaje: 'Umbral configurado correctamente.', producto })
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.mensaje })
+    next(error)
+  }
+}
+
+module.exports = { listarCategorias, crearProducto, listarProductos, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarProducto, configurarUmbral }

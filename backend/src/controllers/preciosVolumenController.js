@@ -1,4 +1,4 @@
-const preciosVolumenServicio = require('../servicios/preciosVolumen.servicio')
+const preciosVolumenServicio = require('../services/preciosVolumen.servicio')
 
 async function listarPrecios(req, res, next) {
   try {
