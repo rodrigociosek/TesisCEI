@@ -4,7 +4,6 @@
 # Herramientas de desarrollo local (no van al repo compartido)
 docs/
 
-
 # Dependencias
 node_modules/
 dist/
