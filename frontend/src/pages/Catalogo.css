@@ -20,9 +20,33 @@
   color: #fff;
 }
 
+.catalogo-header-buscador {
+  flex: 1;
+  max-width: 480px;
+  height: 36px;
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 8px;
+  cursor: text;
+}
+
+.catalogo-header-buscador-icono {
+  font-size: 16px;
+  color: #555;
+}
+
+.catalogo-header-buscador-texto {
+  font-size: 13px;
+  color: #555;
+}
+
 .catalogo-header-acciones {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -40,6 +64,23 @@
 .catalogo-btn-login:hover {
   border-color: #fff;
   color: #fff;
+}
+
+.catalogo-btn-registro {
+  background: #fff;
+  border: 1px solid #fff;
+  color: #111;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.catalogo-btn-registro:hover {
+  background: #ddd;
+  border-color: #ddd;
 }
 
 /* Contenido */
