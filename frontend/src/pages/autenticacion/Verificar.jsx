@@ -19,12 +19,9 @@ function Verificar() {
         codigo
       })
       localStorage.setItem('telefono', telefono)
-      localStorage.setItem('nombre', nombre)
+      localStorage.setItem('nombre', res.data.nombre || nombre)
       localStorage.setItem('modoDistribuidorActivo', 'false')
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token)
-      }
-      setMensaje(res.data.mensaje)
+      localStorage.setItem('token', res.data.token)
       navigate('/inicioComprador')
     } catch (error) {
       setMensaje(error.response.data.mensaje)

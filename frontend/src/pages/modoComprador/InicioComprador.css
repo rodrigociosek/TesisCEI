@@ -1,0 +1,90 @@
+.comprador-grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.comprador-tarjeta {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s;
+  cursor: pointer;
+}
+
+.comprador-tarjeta:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+.comprador-tarjeta-imagen {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.comprador-tarjeta-imagen-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  font-size: 12px;
+}
+
+.comprador-tarjeta-cuerpo {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 3px;
+}
+
+.comprador-tarjeta-categoria {
+  font-size: 10px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comprador-tarjeta-nombre {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.3;
+}
+
+.comprador-tarjeta-descripcion {
+  font-size: 11px;
+  color: #777;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.comprador-tarjeta-pie {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comprador-tarjeta-distribuidor {
+  font-size: 10px;
+  color: #aaa;
+}
+
+.comprador-tarjeta-precio {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+}
