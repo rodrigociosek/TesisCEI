@@ -1,5 +1,20 @@
 const repartoServicio = require('../services/reparto.servicio')
 
+async function generarPlan(req, res, next) {
+  const { pedidoIds } = req.body
+
+  if (!Array.isArray(pedidoIds) || pedidoIds.length < 2) {
+    return res.status(400).json({ error: 'Seleccioná al menos dos pedidos para generar la planificación.' })
+  }
+
+  try {
+    const resultado = await repartoServicio.generarPlanCarga(req.usuario.id, pedidoIds)
+    res.status(201).json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
 async function listarPlanes(req, res, next) {
   try {
     const planes = await repartoServicio.obtenerPlanes(req.usuario.id)
@@ -9,4 +24,4 @@ async function listarPlanes(req, res, next) {
   }
 }
 
-module.exports = { listarPlanes }
+module.exports = { generarPlan, listarPlanes }

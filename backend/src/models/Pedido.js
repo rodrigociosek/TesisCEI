@@ -237,6 +237,41 @@ class Pedido {
     return res.rows[0]
   }
 
+  // RF-043: pedidos elegibles para incluir en una planificación de reparto:
+  // "Aceptado" (con dirección de entrega registrada — siempre, desde que
+  // confirmar el pedido exige coordenadas, RF-008), del distribuidor, que
+  // todavía no están en un plan de reparto no finalizado.
+  static async listarDisponiblesRepartoDistribuidor(usuarioId, planIdIncluir = null) {
+    const res = await pool.query(
+      `SELECT
+         p.id, p.direccion_entrega AS "direccionEntrega", p.latitud, p.longitud,
+         u.nombre_completo AS "nombreComprador",
+         COALESCE(
+           json_agg(
+             json_build_object('nombreProducto', pr.nombre, 'cantidad', pi.cantidad)
+             ORDER BY pi.id
+           ) FILTER (WHERE pi.id IS NOT NULL),
+           '[]'
+         ) AS items
+       FROM pedido p
+       JOIN distribuidor d ON d.id = p.distribuidor_id
+       JOIN usuario u ON u.id = p.comprador_id
+       LEFT JOIN pedido_item pi ON pi.pedido_id = p.id
+       LEFT JOIN producto pr ON pr.id = pi.producto_id
+       WHERE d.usuario_id = $1 AND p.estado = 'aceptado'
+         AND NOT EXISTS (
+           SELECT 1 FROM parada_reparto pr2
+           JOIN plan_reparto plr ON plr.id = pr2.plan_reparto_id
+           WHERE pr2.pedido_id = p.id AND plr.estado != 'finalizado'
+             AND plr.id IS DISTINCT FROM $2
+         )
+       GROUP BY p.id, u.nombre_completo
+       ORDER BY p.fecha_creacion ASC`,
+      [usuarioId, planIdIncluir]
+    )
+    return res.rows
+  }
+
   static async obtenerPropioDistribuidor(pedidoId, distribuidorUsuarioId, cliente = pool) {
     const res = await cliente.query(
       `SELECT p.*, u.telefono AS telefono_comprador, u.nombre_completo AS nombre_comprador,
