@@ -27,6 +27,7 @@ import DetallePedido from './pages/modoComprador/DetallePedido'
 import DetallePedidoDistribuidor from './pages/modoDistribuidor/DetallePedido'
 import ProponerSustituto from './pages/modoDistribuidor/ProponerSustituto'
 import Reportes from './pages/modoDistribuidor/Reportes'
+import Rentabilidad from './pages/modoDistribuidor/Rentabilidad'
 
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
           <Route path='/pedidos/:id' element={<DetallePedidoDistribuidor />} />
           <Route path='/pedidos/:id/sustituir' element={<ProponerSustituto />} />
           <Route path='/reportes' element={<Reportes />} />
+          <Route path='/reportes/rentabilidad' element={<Rentabilidad />} />
           <Route path='/misPedidos' element={<MisPedidosComprador />} />
           <Route path='/pedido/:id' element={<DetallePedido />} />
           <Route path='/catalogo' element={<Catalogo />} />

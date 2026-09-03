@@ -17,4 +17,13 @@ async function obtenerRendimiento(req, res, next) {
   }
 }
 
-module.exports = { obtenerRendimiento }
+async function obtenerRentabilidad(req, res, next) {
+  try {
+    const rentabilidad = await reportesServicio.calcularRentabilidadPorPrecioVolumen(req.usuario.id)
+    res.json(rentabilidad)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { obtenerRendimiento, obtenerRentabilidad }

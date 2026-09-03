@@ -1,5 +1,6 @@
 const Pedido = require('../models/Pedido')
 const Producto = require('../models/Producto')
+const PrecioVolumen = require('../models/PrecioVolumen')
 
 const LIMITE_RANKING_PRODUCTOS = 5
 
@@ -47,4 +48,9 @@ async function generarReporteRendimiento(usuarioDistribuidorId, periodo) {
   }
 }
 
-module.exports = { generarReporteRendimiento }
+// RF-036: rentabilidad por tramo de precio por volumen.
+async function calcularRentabilidadPorPrecioVolumen(usuarioDistribuidorId) {
+  return PrecioVolumen.listarConRentabilidadPorDistribuidor(usuarioDistribuidorId)
+}
+
+module.exports = { generarReporteRendimiento, calcularRentabilidadPorPrecioVolumen }
