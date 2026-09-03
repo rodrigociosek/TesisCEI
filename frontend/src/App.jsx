@@ -20,6 +20,7 @@ import EditarProducto from './pages/modoDistribuidor/EditarProducto'
 import MisPedidos from './pages/modoDistribuidor/MisPedidos'
 import Reparto from './pages/modoDistribuidor/Reparto'
 import CrearReparto from './pages/modoDistribuidor/CrearReparto'
+import DetalleReparto from './pages/modoDistribuidor/DetalleReparto'
 import Catalogo from './pages/Catalogo'
 import DetalleProducto from './pages/modoComprador/DetalleProducto'
 import DetallePedido from './pages/modoComprador/DetallePedido'
@@ -49,6 +50,7 @@ function App() {
           <Route path='/pedidos' element={<MisPedidos />} />
           <Route path='/reparto' element={<Reparto />} />
           <Route path='/reparto/nuevo' element={<CrearReparto />} />
+          <Route path='/reparto/:id' element={<DetalleReparto />} />
           <Route path='/pedidos/:id' element={<DetallePedidoDistribuidor />} />
           <Route path='/misPedidos' element={<MisPedidosComprador />} />
           <Route path='/pedido/:id' element={<DetallePedido />} />

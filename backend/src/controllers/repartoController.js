@@ -24,4 +24,14 @@ async function listarPlanes(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes }
+async function obtenerDetalle(req, res, next) {
+  const planId = Number(req.params.id)
+  try {
+    const detalle = await repartoServicio.obtenerDetalle(req.usuario.id, planId)
+    res.json(detalle)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle }

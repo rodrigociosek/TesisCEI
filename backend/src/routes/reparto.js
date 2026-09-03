@@ -6,5 +6,6 @@ const router = express.Router()
 
 router.post('/generar', verificarToken, repartoController.generarPlan)
 router.get('/planes', verificarToken, repartoController.listarPlanes)
+router.get('/:id', verificarToken, repartoController.obtenerDetalle)
 
 module.exports = router
