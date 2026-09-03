@@ -112,4 +112,26 @@ async function cerrarEnBloque(usuarioId, planId, motivo) {
   return plan
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque }
+async function marcarParada(usuarioId, planId, paradaId, accion, motivo) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
+
+  if ((accion === 'omitido' || accion === 'rechazado') && (!motivo || !motivo.trim())) {
+    throw Object.assign(new Error('Ingresá un motivo antes de confirmar.'), { status: 400 })
+  }
+
+  const resultado = await PlanReparto.marcarParada(
+    planId, distribuidor.id, paradaId, accion, motivo ? motivo.trim() : null, distribuidor.nombreComercial
+  )
+  if (resultado === 'plan_no_valido') {
+    throw Object.assign(new Error('El reparto no existe o no está en curso.'), { status: 404 })
+  }
+  if (resultado === 'parada_no_valida') {
+    throw Object.assign(new Error('La parada no existe o ya fue marcada.'), { status: 404 })
+  }
+  return { mensaje: 'La parada quedó marcada correctamente.' }
+}
+
+module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque, marcarParada }

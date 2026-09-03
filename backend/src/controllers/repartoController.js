@@ -81,4 +81,21 @@ async function cerrarEnBloque(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque }
+async function marcarParada(req, res, next) {
+  const planId = Number(req.params.id)
+  const paradaId = Number(req.params.paradaId)
+  const { accion, motivo } = req.body
+
+  if (!['entregado', 'omitido', 'rechazado'].includes(accion)) {
+    return res.status(400).json({ error: 'Acción inválida.' })
+  }
+
+  try {
+    const resultado = await repartoServicio.marcarParada(req.usuario.id, planId, paradaId, accion, motivo)
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque, marcarParada }

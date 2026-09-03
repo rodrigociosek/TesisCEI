@@ -419,6 +419,113 @@ class PlanReparto {
     }
   }
 
+  // RF-046: marca una parada pendiente de un reparto "en_curso" como
+  // Entregada, Omitida o Rechazada. Entregado y Rechazado replican, dentro
+  // de esta misma transacción, exactamente la transición de pedido que
+  // Pedido.avanzarEstado/rechazar ya usan para "En camino" → "Entregado"/
+  // "Rechazado" (mismo movimiento de stock, mismo texto de notificación,
+  // RF-024/RF-027) — no se llama a esos métodos de instancia porque cada
+  // uno abre su propia transacción, y acá la marca de la parada, el cambio
+  // de estado del pedido y la posible finalización del reparto tienen que
+  // ser atómicos. Omitido vuelve el pedido a "Aceptado" (sin tocar el stock
+  // reservado, que sigue siendo necesario) para que quede disponible para
+  // un reparto futuro — el índice único de parada_reparto.pedido_id excluye
+  // las paradas "omitido" exactamente para permitir esto (ver MER). No
+  // dispara notificación: "En camino" → "Aceptado" no está en la lista de
+  // transiciones que notifican (RF-027). Devuelve 'plan_no_valido' si el
+  // reparto no existe o no está "en_curso", 'parada_no_valida' si la parada
+  // no existe, no pertenece a este plan o ya fue marcada (no se puede
+  // desmarcar), o 'marcado' si se aplicó.
+  static async marcarParada(planId, distribuidorId, paradaId, accion, motivo, nombreDistribuidor) {
+    const cliente = await pool.connect()
+    try {
+      await cliente.query('BEGIN')
+
+      const resPlan = await cliente.query(
+        `SELECT * FROM plan_reparto WHERE id = $1 AND distribuidor_id = $2 AND estado = 'en_curso' FOR UPDATE`,
+        [planId, distribuidorId]
+      )
+      if (resPlan.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return 'plan_no_valido'
+      }
+
+      const resParada = await cliente.query(
+        `SELECT * FROM parada_reparto WHERE id = $1 AND plan_reparto_id = $2 AND estado_parada = 'pendiente' FOR UPDATE`,
+        [paradaId, planId]
+      )
+      if (resParada.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return 'parada_no_valida'
+      }
+      const parada = resParada.rows[0]
+
+      if (accion === 'entregado' || accion === 'rechazado') {
+        const resPedido = await cliente.query(
+          `SELECT id, comprador_id AS "compradorId" FROM pedido WHERE id = $1`,
+          [parada.pedido_id]
+        )
+        const pedido = resPedido.rows[0]
+        const items = (await cliente.query(
+          `SELECT producto_id AS "productoId", cantidad FROM pedido_item WHERE pedido_id = $1`,
+          [pedido.id]
+        )).rows
+
+        if (accion === 'entregado') {
+          await cliente.query(
+            `UPDATE pedido SET estado = 'entregado', fecha_entregado = NOW() WHERE id = $1`,
+            [pedido.id]
+          )
+          for (const item of items) {
+            await cliente.query(
+              `UPDATE producto SET stock_total = stock_total - $1, stock_reservado = stock_reservado - $1 WHERE id = $2`,
+              [item.cantidad, item.productoId]
+            )
+          }
+        } else {
+          await cliente.query(
+            `UPDATE pedido SET estado = 'rechazado', motivo_rechazo = $1 WHERE id = $2`,
+            [motivo, pedido.id]
+          )
+          for (const item of items) {
+            await cliente.query(
+              `UPDATE producto SET stock_reservado = stock_reservado - $1 WHERE id = $2`,
+              [item.cantidad, item.productoId]
+            )
+          }
+        }
+
+        await Notificacion.crear(
+          pedido.compradorId, 'cambio_estado_pedido',
+          Pedido.mensajeCambioEstado(nombreDistribuidor, accion, motivo), pedido.id, cliente
+        )
+      } else if (accion === 'omitido') {
+        await cliente.query(`UPDATE pedido SET estado = 'aceptado' WHERE id = $1`, [parada.pedido_id])
+      }
+
+      await cliente.query(
+        `UPDATE parada_reparto SET estado_parada = $1, motivo = $2 WHERE id = $3`,
+        [accion, motivo, paradaId]
+      )
+
+      const resPendientes = await cliente.query(
+        `SELECT COUNT(*)::int AS cantidad FROM parada_reparto WHERE plan_reparto_id = $1 AND estado_parada = 'pendiente'`,
+        [planId]
+      )
+      if (resPendientes.rows[0].cantidad === 0) {
+        await cliente.query(`UPDATE plan_reparto SET estado = 'finalizado' WHERE id = $1`, [planId])
+      }
+
+      await cliente.query('COMMIT')
+      return 'marcado'
+    } catch (error) {
+      await cliente.query('ROLLBACK')
+      throw error
+    } finally {
+      cliente.release()
+    }
+  }
+
   // RF-065: elimina un reparto "Sin empezar" (nunca tiene paradas
   // marcadas, porque marcar requiere haberlo iniciado primero, RF-066).
   // Un reparto "En curso" no se elimina — se cierra en bloque (RF-067);
