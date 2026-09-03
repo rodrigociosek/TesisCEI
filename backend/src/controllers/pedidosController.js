@@ -123,4 +123,31 @@ async function proponerSustituto(req, res, next) {
   }
 }
 
-module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto }
+// RF-026: el comprador elige la cantidad del sustituto al aceptar.
+async function aceptarSustitucion(req, res, next) {
+  const propuestaId = Number(req.params.propuestaId)
+  const { cantidad } = req.body
+
+  if (!cantidad || !Number.isInteger(Number(cantidad)) || Number(cantidad) <= 0) {
+    return res.status(400).json({ error: 'Ingresá la cantidad del producto sustituto antes de aceptar la propuesta.' })
+  }
+
+  try {
+    const resultado = await pedidosServicio.responderSustitucion(propuestaId, req.usuario.id, 'aceptar', Number(cantidad))
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+async function rechazarSustitucion(req, res, next) {
+  const propuestaId = Number(req.params.propuestaId)
+  try {
+    const resultado = await pedidosServicio.responderSustitucion(propuestaId, req.usuario.id, 'rechazar')
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto, aceptarSustitucion, rechazarSustitucion }
