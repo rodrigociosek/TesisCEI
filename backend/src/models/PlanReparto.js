@@ -302,6 +302,46 @@ class PlanReparto {
       cliente.release()
     }
   }
+
+  // RF-065: elimina un reparto "Sin empezar" (nunca tiene paradas
+  // marcadas, porque marcar requiere haberlo iniciado primero, RF-066).
+  // Un reparto "En curso" no se elimina — se cierra en bloque (RF-067);
+  // el panel (RF-063) ya dirige ahí, esto es la barrera del lado del
+  // servidor. No hay ON DELETE CASCADE entre parada_reparto y
+  // plan_reparto (ver MER), así que las paradas (todas "pendiente" a
+  // esta altura) se borran primero. Los pedidos que incluía quedan
+  // libres automáticamente: al no quedar parada_reparto asociada,
+  // RF-043 vuelve a listarlos como disponibles.
+  static async eliminar(planId, distribuidorId) {
+    const cliente = await pool.connect()
+    try {
+      await cliente.query('BEGIN')
+
+      const resPlan = await cliente.query(
+        `SELECT estado FROM plan_reparto WHERE id = $1 AND distribuidor_id = $2 FOR UPDATE`,
+        [planId, distribuidorId]
+      )
+      if (resPlan.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return 'no_encontrado'
+      }
+      if (resPlan.rows[0].estado !== 'sin_empezar') {
+        await cliente.query('ROLLBACK')
+        return 'no_es_sin_empezar'
+      }
+
+      await cliente.query(`DELETE FROM parada_reparto WHERE plan_reparto_id = $1`, [planId])
+      await cliente.query(`DELETE FROM plan_reparto WHERE id = $1`, [planId])
+
+      await cliente.query('COMMIT')
+      return 'eliminado'
+    } catch (error) {
+      await cliente.query('ROLLBACK')
+      throw error
+    } finally {
+      cliente.release()
+    }
+  }
 }
 
 module.exports = PlanReparto

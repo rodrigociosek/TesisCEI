@@ -66,4 +66,20 @@ async function editarPedidos(usuarioId, planId, pedidoIds) {
   return resultado
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos }
+async function eliminarReparto(usuarioId, planId) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
+
+  const resultado = await PlanReparto.eliminar(planId, distribuidor.id)
+  if (resultado === 'no_encontrado') {
+    throw Object.assign(new Error('El reparto no existe.'), { status: 404 })
+  }
+  if (resultado === 'no_es_sin_empezar') {
+    throw Object.assign(new Error('Este plan tiene paradas ya marcadas y no puede eliminarse.'), { status: 409 })
+  }
+  return { mensaje: 'El plan de reparto fue eliminado correctamente.' }
+}
+
+module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto }

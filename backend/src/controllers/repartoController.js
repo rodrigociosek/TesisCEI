@@ -50,4 +50,14 @@ async function editarPedidos(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos }
+async function eliminar(req, res, next) {
+  const planId = Number(req.params.id)
+  try {
+    const resultado = await repartoServicio.eliminarReparto(req.usuario.id, planId)
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar }
