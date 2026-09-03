@@ -303,6 +303,68 @@ class PlanReparto {
     }
   }
 
+  // RF-066: inicio manual, pasa el reparto de "sin_empezar" a "en_curso". No
+  // toca las paradas, pero sí los pedidos que contiene: cada uno pasa de
+  // "Aceptado" a "En camino" (mismo texto de notificación que
+  // Pedido.avanzarEstado, RF-027), porque a partir de acá marcar una parada
+  // (RF-046) necesita que el pedido ya esté "En camino" para poder
+  // transicionarlo a Entregado o Rechazado igual que RF-024/RF-025.
+  static async iniciar(planId, distribuidorId, nombreDistribuidor) {
+    const cliente = await pool.connect()
+    try {
+      await cliente.query('BEGIN')
+
+      const resPlan = await cliente.query(
+        `SELECT * FROM plan_reparto WHERE id = $1 AND distribuidor_id = $2 AND estado = 'sin_empezar' FOR UPDATE`,
+        [planId, distribuidorId]
+      )
+      if (resPlan.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return null
+      }
+
+      // Defensa adicional: Pedido.cancelar() ya quita la parada de un pedido
+      // cancelado mientras el plan sigue "sin_empezar" (RF-069), pero por si
+      // quedara alguna parada huérfana de un pedido que ya no está
+      // "Aceptado" (dato viejo, o cualquier otro camino que la haya dejado
+      // atrás), se descarta acá antes de arrancar — así el UPDATE de abajo
+      // nunca puede resucitar un pedido cancelado/rechazado a "En camino".
+      await cliente.query(
+        `DELETE FROM parada_reparto
+         WHERE plan_reparto_id = $1
+           AND pedido_id NOT IN (SELECT id FROM pedido WHERE estado = 'aceptado')`,
+        [planId]
+      )
+
+      const resPedidos = await cliente.query(
+        `UPDATE pedido SET estado = 'en_camino'
+         WHERE estado = 'aceptado'
+           AND id IN (SELECT pedido_id FROM parada_reparto WHERE plan_reparto_id = $1)
+         RETURNING id, comprador_id AS "compradorId"`,
+        [planId]
+      )
+      for (const pedido of resPedidos.rows) {
+        await Notificacion.crear(
+          pedido.compradorId, 'cambio_estado_pedido',
+          Pedido.mensajeCambioEstado(nombreDistribuidor, 'en_camino'), pedido.id, cliente
+        )
+      }
+
+      const resPlanFinal = await cliente.query(
+        `UPDATE plan_reparto SET estado = 'en_curso' WHERE id = $1 RETURNING *`,
+        [planId]
+      )
+
+      await cliente.query('COMMIT')
+      return new PlanReparto(resPlanFinal.rows[0])
+    } catch (error) {
+      await cliente.query('ROLLBACK')
+      throw error
+    } finally {
+      cliente.release()
+    }
+  }
+
   // RF-065: elimina un reparto "Sin empezar" (nunca tiene paradas
   // marcadas, porque marcar requiere haberlo iniciado primero, RF-066).
   // Un reparto "En curso" no se elimina — se cierra en bloque (RF-067);

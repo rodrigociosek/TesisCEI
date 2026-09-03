@@ -9,5 +9,6 @@ router.get('/planes', verificarToken, repartoController.listarPlanes)
 router.get('/:id', verificarToken, repartoController.obtenerDetalle)
 router.put('/:id/pedidos', verificarToken, repartoController.editarPedidos)
 router.delete('/:id', verificarToken, repartoController.eliminar)
+router.post('/:id/iniciar', verificarToken, repartoController.iniciar)
 
 module.exports = router

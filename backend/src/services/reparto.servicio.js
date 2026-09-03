@@ -82,4 +82,17 @@ async function eliminarReparto(usuarioId, planId) {
   return { mensaje: 'El plan de reparto fue eliminado correctamente.' }
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto }
+async function iniciarReparto(usuarioId, planId) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
+
+  const plan = await PlanReparto.iniciar(planId, distribuidor.id, distribuidor.nombreComercial)
+  if (!plan) {
+    throw Object.assign(new Error('El reparto no existe o ya no está en estado "Sin empezar".'), { status: 404 })
+  }
+  return plan
+}
+
+module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto }
