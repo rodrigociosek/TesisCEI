@@ -55,4 +55,10 @@ async function avanzarEstado(pedidoId, distribuidorUsuarioId) {
   return pedido.avanzarEstado()
 }
 
-module.exports = { confirmarPedido, obtenerHistorialDistribuidor, obtenerHistorialComprador, obtenerPedidosActivos, obtenerDetalleComprador, obtenerDetalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado }
+// RF-025
+async function proponerSustituto(pedidoId, distribuidorUsuarioId, pedidoItemId, productoSustitutoId) {
+  const pedido = await obtenerPedidoPropio(pedidoId, distribuidorUsuarioId)
+  return pedido.proponerSustituto(pedidoItemId, productoSustitutoId)
+}
+
+module.exports = { confirmarPedido, obtenerHistorialDistribuidor, obtenerHistorialComprador, obtenerPedidosActivos, obtenerDetalleComprador, obtenerDetalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto }
