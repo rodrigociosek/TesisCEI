@@ -1,5 +1,7 @@
 const pool = require('../config/db')
 const ParadaReparto = require('./ParadaReparto')
+const Pedido = require('./Pedido')
+const Notificacion = require('./Notificacion')
 
 const RADIO_TIERRA_KM = 6371
 const OSRM_TABLE_URL = 'https://router.project-osrm.org/table/v1/driving'
@@ -192,6 +194,113 @@ class PlanReparto {
     )
 
     return { plan, paradas: resParadas.rows }
+  }
+
+  // RF-064: agrega o quita pedidos de un reparto no finalizado. pedidos:
+  // conjunto deseado de pedidos pendientes, filas ya validadas de
+  // Pedido.listarDisponiblesRepartoDistribuidor(usuarioId, planId) — NO
+  // incluye pedidos con parada ya marcada, esos quedan fijos siempre y se
+  // resuelven acá contra las paradas actuales, no contra este parámetro.
+  static async editarPedidos(planId, distribuidorId, pedidos, latitudPartida, longitudPartida, nombreDistribuidor) {
+    const cliente = await pool.connect()
+    try {
+      await cliente.query('BEGIN')
+
+      const resPlan = await cliente.query(
+        `SELECT * FROM plan_reparto WHERE id = $1 AND distribuidor_id = $2 AND estado != 'finalizado' FOR UPDATE`,
+        [planId, distribuidorId]
+      )
+      if (resPlan.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return null
+      }
+      const plan = new PlanReparto(resPlan.rows[0])
+
+      const resParadas = await cliente.query(
+        `SELECT * FROM parada_reparto WHERE plan_reparto_id = $1`,
+        [planId]
+      )
+      const paradasActuales = resParadas.rows.map(r => new ParadaReparto(r))
+      const marcadas = paradasActuales.filter(p => p.estadoParada !== 'pendiente')
+      const pendientesActuales = paradasActuales.filter(p => p.estadoParada === 'pendiente')
+
+      const idsDeseados = new Set(pedidos.map(p => p.id))
+
+      for (const parada of marcadas) {
+        if (!idsDeseados.has(parada.pedidoId)) {
+          const err = new Error('No se puede quitar una parada que ya fue marcada como Entregada, Omitida o Rechazada.')
+          err.status = 409
+          throw err
+        }
+      }
+
+      const aQuitar = pendientesActuales.filter(p => !idsDeseados.has(p.pedidoId))
+      for (const parada of aQuitar) {
+        await cliente.query(`DELETE FROM parada_reparto WHERE id = $1`, [parada.id])
+      }
+
+      const idsExistentes = new Set(paradasActuales.map(p => p.pedidoId))
+      const aAgregar = pedidos.filter(p => !idsExistentes.has(p.id))
+      for (const pedido of aAgregar) {
+        await cliente.query(
+          `INSERT INTO parada_reparto (plan_reparto_id, pedido_id, orden, estado_parada)
+           VALUES ($1, $2, 0, 'pendiente')`,
+          [planId, pedido.id]
+        )
+        // Un reparto "en_curso" ya pasó por iniciar (RF-066), que puso "En
+        // camino" a los pedidos que tenía en ese momento. Un pedido agregado
+        // después, mientras el reparto ya está en curso, necesita el mismo
+        // empujón acá mismo — si no, marcar su parada (RF-046) lo
+        // encontraría todavía en "Aceptado".
+        if (plan.estado === 'en_curso') {
+          const resPedido = await cliente.query(
+            `UPDATE pedido SET estado = 'en_camino' WHERE id = $1 RETURNING comprador_id AS "compradorId"`,
+            [pedido.id]
+          )
+          await Notificacion.crear(
+            resPedido.rows[0].compradorId, 'cambio_estado_pedido',
+            Pedido.mensajeCambioEstado(nombreDistribuidor, 'en_camino'), pedido.id, cliente
+          )
+        }
+      }
+
+      const idsMarcados = new Set(marcadas.map(p => p.pedidoId))
+      const pendientesFinales = pedidos.filter(p => !idsMarcados.has(p.id))
+      // La llamada a OSRM (dentro de ordenarPorDistancia) queda dentro de
+      // esta transacción a propósito: qué pedidos hay que reordenar depende
+      // de lecturas que ya se hicieron acá adentro (paradasActuales,
+      // marcadas), bajo el FOR UPDATE de arriba. Separar esto en un primer
+      // paso de solo lectura antes de abrir la transacción duplicaría esa
+      // lógica y reabriría la ventana de carrera que el FOR UPDATE evita —
+      // el timeout de 5s de OSRM es aceptable acá porque es una edición de
+      // un solo distribuidor sobre su propio plan, no una ruta de alta
+      // concurrencia.
+      const ordenados = await ordenarPorDistancia(pendientesFinales, latitudPartida, longitudPartida)
+      for (let i = 0; i < ordenados.length; i++) {
+        await cliente.query(
+          `UPDATE parada_reparto SET orden = $1 WHERE plan_reparto_id = $2 AND pedido_id = $3`,
+          [i + 1, planId, ordenados[i].id]
+        )
+      }
+
+      await cliente.query('COMMIT')
+
+      const resFinal = await cliente.query(
+        `SELECT * FROM parada_reparto WHERE plan_reparto_id = $1 ORDER BY orden`,
+        [planId]
+      )
+      return { plan, paradas: resFinal.rows.map(r => new ParadaReparto(r)) }
+    } catch (error) {
+      await cliente.query('ROLLBACK')
+      if (error.code === '23505') {
+        const err = new Error('Uno de los pedidos seleccionados ya forma parte de otro reparto.')
+        err.status = 409
+        throw err
+      }
+      throw error
+    } finally {
+      cliente.release()
+    }
   }
 }
 
