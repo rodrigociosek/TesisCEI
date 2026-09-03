@@ -4,6 +4,7 @@ const repartoController = require('../controllers/repartoController')
 
 const router = express.Router()
 
+router.post('/generar', verificarToken, repartoController.generarPlan)
 router.get('/planes', verificarToken, repartoController.listarPlanes)
 
 module.exports = router
