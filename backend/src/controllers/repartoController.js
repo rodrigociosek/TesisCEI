@@ -98,4 +98,21 @@ async function marcarParada(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque, marcarParada }
+// RF-071
+async function actualizarUbicacion(req, res, next) {
+  const planId = Number(req.params.id)
+  const { latitud, longitud } = req.body
+
+  if (typeof latitud !== 'number' || typeof longitud !== 'number') {
+    return res.status(400).json({ error: 'Ubicación inválida.' })
+  }
+
+  try {
+    const resultado = await repartoServicio.actualizarUbicacion(req.usuario.id, planId, latitud, longitud)
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque, marcarParada, actualizarUbicacion }

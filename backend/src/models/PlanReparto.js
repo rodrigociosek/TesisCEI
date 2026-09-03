@@ -526,6 +526,25 @@ class PlanReparto {
     }
   }
 
+  // RF-071: el celular del distribuidor reporta su posición mientras el
+  // reparto está "en_curso" (el propio distribuidor la ve en su reparto,
+  // RF-072). Solo se guarda el último punto — no hace falta un historial,
+  // ningún RF pide reconstruir el recorrido después del hecho. La
+  // condición "estado = 'en_curso'" en
+  // el WHERE hace que un reporte tardío (llegado después de que el
+  // reparto ya finalizó) no actualice nada, sin necesitar una
+  // transacción ni un chequeo previo.
+  static async actualizarUbicacion(planId, distribuidorId, latitud, longitud) {
+    const res = await pool.query(
+      `UPDATE plan_reparto
+       SET ultima_latitud = $1, ultima_longitud = $2, ultima_ubicacion_fecha = NOW()
+       WHERE id = $3 AND distribuidor_id = $4 AND estado = 'en_curso'
+       RETURNING id`,
+      [latitud, longitud, planId, distribuidorId]
+    )
+    return res.rows.length > 0
+  }
+
   // RF-065: elimina un reparto "Sin empezar" (nunca tiene paradas
   // marcadas, porque marcar requiere haberlo iniciado primero, RF-066).
   // Un reparto "En curso" no se elimina — se cierra en bloque (RF-067);
