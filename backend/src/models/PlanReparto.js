@@ -148,6 +148,51 @@ class PlanReparto {
     )
     return res.rows
   }
+
+  // RF-045/RF-064: detalle de un reparto con sus paradas y los datos del
+  // pedido de cada una (incluidas las coordenadas, para el mapa de RF-045).
+  // También trae las coordenadas del depósito (distribuidor.latitud/
+  // longitud, RF-042) para poder dibujar la ruta completa sobre el mapa
+  // — el depósito es el punto de partida, no una parada más.
+  static async obtenerDetalle(planId, distribuidorId) {
+    const resPlan = await pool.query(
+      `SELECT p.*, d.latitud AS deposito_latitud, d.longitud AS deposito_longitud
+       FROM plan_reparto p
+       JOIN distribuidor d ON d.id = p.distribuidor_id
+       WHERE p.id = $1 AND p.distribuidor_id = $2`,
+      [planId, distribuidorId]
+    )
+    if (resPlan.rows.length === 0) return null
+    const plan = new PlanReparto(resPlan.rows[0])
+    plan.depositoLatitud = resPlan.rows[0].deposito_latitud
+    plan.depositoLongitud = resPlan.rows[0].deposito_longitud
+
+    const resParadas = await pool.query(
+      `SELECT
+         pa.id, pa.orden, pa.estado_parada AS "estadoParada", pa.motivo,
+         p.id AS "pedidoId", p.direccion_entrega AS "direccionEntrega",
+         p.latitud, p.longitud,
+         u.nombre_completo AS "nombreComprador", u.telefono AS "telefonoComprador",
+         COALESCE(
+           json_agg(
+             json_build_object('nombreProducto', pr.nombre, 'cantidad', pi.cantidad, 'imagenUrl', pr.imagen_url)
+             ORDER BY pi.id
+           ) FILTER (WHERE pi.id IS NOT NULL),
+           '[]'
+         ) AS items
+       FROM parada_reparto pa
+       JOIN pedido p ON p.id = pa.pedido_id
+       JOIN usuario u ON u.id = p.comprador_id
+       LEFT JOIN pedido_item pi ON pi.pedido_id = p.id
+       LEFT JOIN producto pr ON pr.id = pi.producto_id
+       WHERE pa.plan_reparto_id = $1
+       GROUP BY pa.id, p.id, u.id
+       ORDER BY pa.orden`,
+      [planId]
+    )
+
+    return { plan, paradas: resParadas.rows }
+  }
 }
 
 module.exports = PlanReparto

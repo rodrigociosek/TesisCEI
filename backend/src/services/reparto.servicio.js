@@ -32,4 +32,17 @@ async function obtenerPlanes(usuarioId) {
   return PlanReparto.listarPorDistribuidor(distribuidor.id)
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes }
+async function obtenerDetalle(usuarioId, planId) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
+
+  const detalle = await PlanReparto.obtenerDetalle(planId, distribuidor.id)
+  if (!detalle) {
+    throw Object.assign(new Error('El reparto no existe.'), { status: 404 })
+  }
+  return detalle
+}
+
+module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle }
