@@ -12,5 +12,6 @@ router.delete('/:id', verificarToken, repartoController.eliminar)
 router.post('/:id/iniciar', verificarToken, repartoController.iniciar)
 router.post('/:id/cerrar-en-bloque', verificarToken, repartoController.cerrarEnBloque)
 router.post('/:id/paradas/:paradaId/marcar', verificarToken, repartoController.marcarParada)
+router.patch('/:id/ubicacion', verificarToken, repartoController.actualizarUbicacion)
 
 module.exports = router

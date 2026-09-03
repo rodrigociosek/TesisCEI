@@ -134,4 +134,18 @@ async function marcarParada(usuarioId, planId, paradaId, accion, motivo) {
   return { mensaje: 'La parada quedó marcada correctamente.' }
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque, marcarParada }
+// RF-071
+async function actualizarUbicacion(usuarioId, planId, latitud, longitud) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
+
+  const actualizado = await PlanReparto.actualizarUbicacion(planId, distribuidor.id, latitud, longitud)
+  if (!actualizado) {
+    throw Object.assign(new Error('El reparto no existe o no está en curso.'), { status: 404 })
+  }
+  return { ok: true }
+}
+
+module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque, marcarParada, actualizarUbicacion }
