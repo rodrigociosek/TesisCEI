@@ -150,4 +150,15 @@ async function rechazarSustitucion(req, res, next) {
   }
 }
 
-module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto, aceptarSustitucion, rechazarSustitucion }
+// RF-069
+async function cancelarPedido(req, res, next) {
+  const pedidoId = Number(req.params.id)
+  try {
+    const resultado = await pedidosServicio.cancelarPedido(pedidoId, req.usuario.id)
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, cancelarPedido, proponerSustituto, aceptarSustitucion, rechazarSustitucion }

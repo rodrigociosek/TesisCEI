@@ -291,6 +291,22 @@ class Pedido {
     return pedido
   }
 
+  // RF-069: fetch-y-scope simétrico a obtenerPropioDistribuidor, pero
+  // verificando que el pedido pertenezca al comprador que pide cancelarlo.
+  static async obtenerPropioComprador(pedidoId, compradorId, cliente = pool) {
+    const res = await cliente.query(
+      `SELECT p.*, d.nombre_comercial AS nombre_distribuidor
+       FROM pedido p
+       JOIN distribuidor d ON d.id = p.distribuidor_id
+       WHERE p.id = $1 AND p.comprador_id = $2`,
+      [pedidoId, compradorId]
+    )
+    if (res.rows.length === 0) return null
+    const pedido = new Pedido(res.rows[0])
+    pedido.nombreDistribuidor = res.rows[0].nombre_distribuidor
+    return pedido
+  }
+
   // RF-025: el distribuidor propone un producto de su propio catálogo para
   // sustituir un ítem de un pedido "Pendiente". Solo el producto — la
   // cantidad y el precio los define el comprador al responder (RF-026, ver
@@ -488,6 +504,78 @@ class Pedido {
 
       await cliente.query('COMMIT')
       return { id: this.id, estado: nuevoEstado }
+    } catch (error) {
+      await cliente.query('ROLLBACK')
+      throw error
+    } finally {
+      cliente.release()
+    }
+  }
+
+  // RF-069: el comprador cancela su propio pedido mientras esté en
+  // "Pendiente" o "Aceptado" (no más allá: una vez "En camino" el reparto
+  // ya salió, confirmado con el usuario). A diferencia de rechazar()
+  // (RF-024, acción del distribuidor), no exige un motivo: es la
+  // propia decisión del comprador sobre su propio pedido, no tiene que
+  // justificarse ante nadie (confirmado con el usuario). Libera el stock
+  // reservado únicamente si venía de "aceptado" — si todavía estaba
+  // "pendiente" nunca se reservó stock (solo aceptar() reserva, arriba).
+  // Notifica al distribuidor: única notificación de este archivo en esa
+  // dirección, por eso no usa notificarCambioEstado/mensajeCambioEstado
+  // (ambos redactados para el sentido distribuidor → comprador).
+  async cancelar() {
+    if (this.estado !== 'pendiente' && this.estado !== 'aceptado') {
+      throw Object.assign(new Error('Solo se pueden cancelar pedidos en estado Pendiente o Aceptado.'), { status: 409 })
+    }
+
+    const cliente = await pool.connect()
+    try {
+      await cliente.query('BEGIN')
+
+      const estadoAnterior = this.estado
+
+      await cliente.query(`UPDATE pedido SET estado = 'cancelado' WHERE id = $1`, [this.id])
+
+      if (estadoAnterior === 'aceptado') {
+        const items = await PedidoItem.listarPorPedido(this.id, cliente)
+        for (const item of items) {
+          await cliente.query(
+            `UPDATE producto SET stock_reservado = stock_reservado - $1 WHERE id = $2`,
+            [item.cantidad, item.productoId]
+          )
+        }
+      }
+
+      // Si el pedido ya estaba en un plan de reparto "sin_empezar" (RF-043),
+      // esa parada queda huérfana al cancelar — se borra acá mismo, en la
+      // misma transacción, para que el reparto no la arrastre.
+      await cliente.query(
+        `DELETE FROM parada_reparto
+         WHERE pedido_id = $1
+           AND plan_reparto_id IN (SELECT id FROM plan_reparto WHERE estado = 'sin_empezar')`,
+        [this.id]
+      )
+
+      this.estado = 'cancelado'
+
+      const resInfo = await cliente.query(
+        `SELECT d.usuario_id AS "distribuidorUsuarioId", u.nombre_completo AS "nombreComprador"
+         FROM distribuidor d
+         JOIN usuario u ON u.id = $2
+         WHERE d.id = $1`,
+        [this.distribuidorId, this.compradorId]
+      )
+      const { distribuidorUsuarioId, nombreComprador } = resInfo.rows[0]
+      await Notificacion.crear(
+        distribuidorUsuarioId,
+        'cambio_estado_pedido',
+        `${nombreComprador} canceló su pedido #${this.id}.`,
+        this.id,
+        cliente
+      )
+
+      await cliente.query('COMMIT')
+      return { id: this.id, estado: 'cancelado' }
     } catch (error) {
       await cliente.query('ROLLBACK')
       throw error

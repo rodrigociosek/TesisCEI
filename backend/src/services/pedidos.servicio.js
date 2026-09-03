@@ -59,6 +59,15 @@ async function avanzarEstado(pedidoId, distribuidorUsuarioId) {
   return pedido.avanzarEstado()
 }
 
+// RF-069
+async function cancelarPedido(pedidoId, compradorId) {
+  const pedido = await Pedido.obtenerPropioComprador(pedidoId, compradorId)
+  if (!pedido) {
+    throw Object.assign(new Error('Pedido no encontrado.'), { status: 404 })
+  }
+  return pedido.cancelar()
+}
+
 // RF-025
 async function proponerSustituto(pedidoId, distribuidorUsuarioId, pedidoItemId, productoSustitutoId) {
   const pedido = await obtenerPedidoPropio(pedidoId, distribuidorUsuarioId)
