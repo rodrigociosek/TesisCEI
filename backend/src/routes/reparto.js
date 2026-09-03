@@ -10,5 +10,6 @@ router.get('/:id', verificarToken, repartoController.obtenerDetalle)
 router.put('/:id/pedidos', verificarToken, repartoController.editarPedidos)
 router.delete('/:id', verificarToken, repartoController.eliminar)
 router.post('/:id/iniciar', verificarToken, repartoController.iniciar)
+router.post('/:id/cerrar-en-bloque', verificarToken, repartoController.cerrarEnBloque)
 
 module.exports = router

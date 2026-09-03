@@ -365,6 +365,60 @@ class PlanReparto {
     }
   }
 
+  // RF-067: omite de una sola vez todas las paradas pendientes de un
+  // reparto "en_curso", con un motivo compartido, y finaliza el reparto
+  // (al no quedar paradas pendientes, la transición a "finalizado" es
+  // automática, igual que si se hubiera marcado la última una por una).
+  // Cada pedido omitido vuelve a "Aceptado", igual que al omitir una
+  // parada individual (RF-046) — ver esa nota para el detalle de por qué.
+  // Devuelve null tanto si el reparto no existe/no está en_curso como si
+  // no tiene ninguna parada pendiente — ambos casos ocultan la opción en
+  // la interfaz, así que no hace falta distinguirlos para quien llama.
+  static async cerrarEnBloque(planId, distribuidorId, motivo) {
+    const cliente = await pool.connect()
+    try {
+      await cliente.query('BEGIN')
+
+      const resPlan = await cliente.query(
+        `SELECT * FROM plan_reparto WHERE id = $1 AND distribuidor_id = $2 AND estado = 'en_curso' FOR UPDATE`,
+        [planId, distribuidorId]
+      )
+      if (resPlan.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return null
+      }
+
+      const resPendientes = await cliente.query(
+        `UPDATE parada_reparto SET estado_parada = 'omitido', motivo = $1
+         WHERE plan_reparto_id = $2 AND estado_parada = 'pendiente'
+         RETURNING pedido_id`,
+        [motivo, planId]
+      )
+      if (resPendientes.rows.length === 0) {
+        await cliente.query('ROLLBACK')
+        return null
+      }
+
+      await cliente.query(
+        `UPDATE pedido SET estado = 'aceptado' WHERE id = ANY($1)`,
+        [resPendientes.rows.map(r => r.pedido_id)]
+      )
+
+      const resPlanFinal = await cliente.query(
+        `UPDATE plan_reparto SET estado = 'finalizado' WHERE id = $1 RETURNING *`,
+        [planId]
+      )
+
+      await cliente.query('COMMIT')
+      return new PlanReparto(resPlanFinal.rows[0])
+    } catch (error) {
+      await cliente.query('ROLLBACK')
+      throw error
+    } finally {
+      cliente.release()
+    }
+  }
+
   // RF-065: elimina un reparto "Sin empezar" (nunca tiene paradas
   // marcadas, porque marcar requiere haberlo iniciado primero, RF-066).
   // Un reparto "En curso" no se elimina — se cierra en bloque (RF-067);
