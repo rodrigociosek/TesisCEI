@@ -9,6 +9,7 @@ router.get('/:id/detalle', verificarToken, pedidosController.detalleDistribuidor
 router.patch('/:id/aceptar', verificarToken, pedidosController.aceptarPedido)
 router.patch('/:id/rechazar', verificarToken, pedidosController.rechazarPedido)
 router.patch('/:id/avanzar', verificarToken, pedidosController.avanzarEstado)
+router.patch('/:id/cancelar', verificarToken, pedidosController.cancelarPedido)
 router.post('/:id/items/:itemId/proponer-sustituto', verificarToken, pedidosController.proponerSustituto)
 router.patch('/sustituciones/:propuestaId/aceptar', verificarToken, pedidosController.aceptarSustitucion)
 router.patch('/sustituciones/:propuestaId/rechazar', verificarToken, pedidosController.rechazarSustitucion)
