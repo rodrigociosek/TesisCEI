@@ -18,6 +18,7 @@ import ConfigurarPerfil from './pages/modoDistribuidor/ConfigurarPerfil'
 import EditarPerfil from './pages/modoDistribuidor/EditarPerfil'
 import EditarProducto from './pages/modoDistribuidor/EditarProducto'
 import MisPedidos from './pages/modoDistribuidor/MisPedidos'
+import Reparto from './pages/modoDistribuidor/Reparto'
 import Catalogo from './pages/Catalogo'
 import DetalleProducto from './pages/modoComprador/DetalleProducto'
 import DetallePedido from './pages/modoComprador/DetallePedido'
@@ -45,6 +46,7 @@ function App() {
           <Route path='/configurarPerfil' element={<ConfigurarPerfil />} />
           <Route path='/editarPerfil' element={<EditarPerfil />} />
           <Route path='/pedidos' element={<MisPedidos />} />
+          <Route path='/reparto' element={<Reparto />} />
           <Route path='/pedidos/:id' element={<DetallePedidoDistribuidor />} />
           <Route path='/misPedidos' element={<MisPedidosComprador />} />
           <Route path='/pedido/:id' element={<DetallePedido />} />
