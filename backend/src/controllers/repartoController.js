@@ -34,4 +34,20 @@ async function obtenerDetalle(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle }
+async function editarPedidos(req, res, next) {
+  const planId = Number(req.params.id)
+  const { pedidoIds } = req.body
+
+  if (!Array.isArray(pedidoIds)) {
+    return res.status(400).json({ error: 'Formato de pedidos inválido.' })
+  }
+
+  try {
+    const resultado = await repartoServicio.editarPedidos(req.usuario.id, planId, pedidoIds)
+    res.json(resultado)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos }

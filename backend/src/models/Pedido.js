@@ -439,4 +439,11 @@ class Pedido {
   }
 }
 
+// RF-064/066/046: el módulo de reparto (PlanReparto) necesita redactar el
+// mismo texto de notificación que ya usa Pedido para sus propias
+// transiciones de estado, para que el comprador reciba el mismo mensaje
+// sin importar si el cambio lo disparó Pedido directamente o una acción
+// sobre el reparto que lo contiene.
+Pedido.mensajeCambioEstado = mensajeCambioEstado
+
 module.exports = Pedido
