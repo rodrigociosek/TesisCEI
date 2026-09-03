@@ -105,4 +105,22 @@ async function avanzarEstado(req, res, next) {
   }
 }
 
-module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado }
+// RF-025
+async function proponerSustituto(req, res, next) {
+  const pedidoId = Number(req.params.id)
+  const pedidoItemId = Number(req.params.itemId)
+  const { productoSustitutoId } = req.body
+
+  if (!productoSustitutoId) {
+    return res.status(400).json({ error: 'Seleccioná un producto sustituto antes de enviar la propuesta.' })
+  }
+
+  try {
+    const propuesta = await pedidosServicio.proponerSustituto(pedidoId, req.usuario.id, pedidoItemId, Number(productoSustitutoId))
+    res.status(201).json(propuesta)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto }
