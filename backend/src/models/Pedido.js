@@ -149,6 +149,28 @@ class Pedido {
     return res.rows
   }
 
+  // RF-035: total facturado y cantidad de pedidos entregados, del
+  // distribuidor, dentro de [fechaInicio, fechaFin). Se filtra por
+  // fecha_entregado (no fecha_creacion) porque un pedido creado en un
+  // período y entregado en otro debe contar en el período de su entrega.
+  static async calcularTotalesEntregados(usuarioDistribuidorId, fechaInicio, fechaFin) {
+    const res = await pool.query(
+      `SELECT
+         COUNT(DISTINCT p.id)::int AS "cantidadPedidosEntregados",
+         COALESCE(SUM(pi.cantidad * pi.precio_venta_congelado), 0) AS "totalFacturado"
+       FROM pedido p
+       JOIN distribuidor d ON d.id = p.distribuidor_id
+       LEFT JOIN pedido_item pi ON pi.pedido_id = p.id
+       WHERE d.usuario_id = $1 AND p.estado = 'entregado'
+         AND p.fecha_entregado >= $2 AND p.fecha_entregado < $3`,
+      [usuarioDistribuidorId, fechaInicio, fechaFin]
+    )
+    return {
+      totalFacturado: Number(res.rows[0].totalFacturado),
+      cantidadPedidosEntregados: res.rows[0].cantidadPedidosEntregados,
+    }
+  }
+
   static async obtenerDetalleComprador(pedidoId, compradorId) {
     const res = await pool.query(
       `SELECT
