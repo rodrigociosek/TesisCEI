@@ -70,4 +70,15 @@ async function iniciar(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar }
+async function cerrarEnBloque(req, res, next) {
+  const planId = Number(req.params.id)
+  const { motivo } = req.body
+  try {
+    const plan = await repartoServicio.cerrarEnBloque(req.usuario.id, planId, motivo)
+    res.json(plan)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque }

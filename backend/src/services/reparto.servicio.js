@@ -95,4 +95,21 @@ async function iniciarReparto(usuarioId, planId) {
   return plan
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto }
+async function cerrarEnBloque(usuarioId, planId, motivo) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
+
+  if (!motivo || !motivo.trim()) {
+    throw Object.assign(new Error('Ingresá un motivo antes de confirmar.'), { status: 400 })
+  }
+
+  const plan = await PlanReparto.cerrarEnBloque(planId, distribuidor.id, motivo.trim())
+  if (!plan) {
+    throw Object.assign(new Error('El reparto no existe, no está en curso o no tiene paradas pendientes.'), { status: 404 })
+  }
+  return plan
+}
+
+module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque }
