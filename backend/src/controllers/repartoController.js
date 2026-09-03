@@ -1,4 +1,4 @@
-const repartoServicio = require('../services/reparto.servicio')
+import * as repartoServicio from '../services/reparto.servicio.js'
 
 async function generarPlan(req, res, next) {
   const { pedidoIds } = req.body
@@ -115,4 +115,4 @@ async function actualizarUbicacion(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque, marcarParada, actualizarUbicacion }
+export { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar, cerrarEnBloque, marcarParada, actualizarUbicacion }

@@ -1,9 +1,9 @@
-const pool = require('../config/db')
-const { validarDatos: validarDatosPrecio } = require('./preciosVolumen.servicio')
-const Categoria = require('../models/Categoria')
-const Producto = require('../models/Producto')
-const PrecioVolumen = require('../models/PrecioVolumen')
-const Distribuidor = require('../models/Distribuidor')
+import pool from '../config/db.js'
+import { validarDatos as validarDatosPrecio } from './preciosVolumen.servicio.js'
+import Categoria from '../models/Categoria.js'
+import Producto from '../models/Producto.js'
+import PrecioVolumen from '../models/PrecioVolumen.js'
+import Distribuidor from '../models/Distribuidor.js'
 
 const notificarSiCruzaUmbral = Producto.notificarSiCruzaUmbral
 
@@ -47,6 +47,28 @@ async function crearProducto(usuarioId, datos) {
 
 async function listarProductos(usuarioId, filtros = {}) {
   return Producto.listarPorDistribuidor(usuarioId, filtros)
+}
+
+// Descuento total del catálogo, aplicado desde el panel "Mis productos" a
+// todos los productos que coincidan con los filtros vigentes en la lista
+// (reemplaza al descuento por producto individual que vivía en la ficha de
+// edición, confirmado con el usuario).
+async function aplicarDescuentoTotal(usuarioId, filtros, porcentaje) {
+  if (!porcentaje || porcentaje <= 0) {
+    const e = new Error()
+    e.status = 400
+    e.mensaje = 'Ingresá un porcentaje de descuento mayor a cero.'
+    throw e
+  }
+  if (porcentaje >= 100) {
+    const e = new Error()
+    e.status = 400
+    e.mensaje = 'El descuento total debe ser menor a 100%.'
+    throw e
+  }
+
+  const productosAfectados = await PrecioVolumen.aplicarDescuentoMasivo(usuarioId, filtros, porcentaje)
+  return { productosAfectados }
 }
 
 async function cambiarVisibilidad(productoId, usuarioId, nuevoEstado) {
@@ -165,4 +187,4 @@ async function configurarUmbralMinimo(productoId, usuarioId, valor) {
   return producto.configurarUmbralMinimo(valor)
 }
 
-module.exports = { obtenerCategorias, validarDatosCreacion, crearProducto, listarProductos, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarOdeshabilitar, configurarUmbralMinimo, notificarSiCruzaUmbral }
+export { obtenerCategorias, validarDatosCreacion, crearProducto, listarProductos, aplicarDescuentoTotal, cambiarVisibilidad, obtenerProducto, editarProducto, eliminarOdeshabilitar, configurarUmbralMinimo, notificarSiCruzaUmbral }

@@ -1,10 +1,10 @@
-const express = require('express')
-const { verificarToken } = require('../middleware/autenticacion')
-const reportesController = require('../controllers/reportesController')
+import express from 'express'
+import { verificarToken } from '../middleware/autenticacion.js'
+import * as reportesController from '../controllers/reportesController.js'
 
 const router = express.Router()
 
 router.get('/rendimiento', verificarToken, reportesController.obtenerRendimiento)
 router.get('/rentabilidad', verificarToken, reportesController.obtenerRentabilidad)
 
-module.exports = router
+export default router

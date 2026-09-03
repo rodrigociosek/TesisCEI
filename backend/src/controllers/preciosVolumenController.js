@@ -1,4 +1,4 @@
-const preciosVolumenServicio = require('../services/preciosVolumen.servicio')
+import * as preciosVolumenServicio from '../services/preciosVolumen.servicio.js'
 
 async function listarPrecios(req, res, next) {
   try {
@@ -66,19 +66,4 @@ async function eliminarPrecio(req, res, next) {
   }
 }
 
-async function aplicarDescuentoTotal(req, res, next) {
-  const { porcentaje } = req.body
-  try {
-    const precios = await preciosVolumenServicio.aplicarDescuentoTotal(
-      Number(req.params.productoId),
-      req.usuario.id,
-      porcentaje !== undefined && porcentaje !== '' ? Number(porcentaje) : 0
-    )
-    res.status(200).json({ mensaje: 'Descuento aplicado correctamente.', precios })
-  } catch (error) {
-    if (error.status) return res.status(error.status).json({ error: error.mensaje })
-    next(error)
-  }
-}
-
-module.exports = { listarPrecios, registrarPrecio, editarPrecio, eliminarPrecio, aplicarDescuentoTotal }
+export { listarPrecios, registrarPrecio, editarPrecio, eliminarPrecio }

@@ -1,6 +1,6 @@
-const express = require('express')
-const { verificarToken } = require('../middleware/autenticacion')
-const repartoController = require('../controllers/repartoController')
+import express from 'express'
+import { verificarToken } from '../middleware/autenticacion.js'
+import * as repartoController from '../controllers/repartoController.js'
 
 const router = express.Router()
 
@@ -14,4 +14,4 @@ router.post('/:id/cerrar-en-bloque', verificarToken, repartoController.cerrarEnB
 router.post('/:id/paradas/:paradaId/marcar', verificarToken, repartoController.marcarParada)
 router.patch('/:id/ubicacion', verificarToken, repartoController.actualizarUbicacion)
 
-module.exports = router
+export default router

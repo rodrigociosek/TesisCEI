@@ -1,4 +1,4 @@
-const pool = require('../config/db')
+import pool from '../config/db.js'
 
 class Distribuidor {
   constructor(data) {
@@ -24,9 +24,6 @@ class Distribuidor {
   return null
 }
 
-  tieneCalificaciones() {
-    return this.calificacionPromedio !== null
-  }
   // RF-048 (ampliación): la ubicación del depósito ya se puede elegir en
   // el mapa desde el alta inicial, no solo después desde Editar perfil
   // (RF-042) — sigue siendo opcional acá también: si no se eligió
@@ -78,4 +75,4 @@ static async obtenerPorUsuarioId(usuarioId) {
 }
 }
 
-module.exports = Distribuidor
+export default Distribuidor

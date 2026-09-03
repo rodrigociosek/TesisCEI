@@ -1,7 +1,7 @@
-const pool = require('../config/db')
-const ParadaReparto = require('./ParadaReparto')
-const Pedido = require('./Pedido')
-const Notificacion = require('./Notificacion')
+import pool from '../config/db.js'
+import ParadaReparto from './ParadaReparto.js'
+import Pedido from './Pedido.js'
+import Notificacion from './Notificacion.js'
 
 const RADIO_TIERRA_KM = 6371
 const OSRM_TABLE_URL = 'https://router.project-osrm.org/table/v1/driving'
@@ -586,4 +586,4 @@ class PlanReparto {
   }
 }
 
-module.exports = PlanReparto
+export default PlanReparto
