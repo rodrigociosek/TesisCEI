@@ -9,6 +9,7 @@ const catalogoRoutes = require('./routes/catalogo')
 const pedidosRoutes = require('./routes/pedidos')
 const notificacionesRoutes = require('./routes/notificaciones')
 const repartoRoutes = require('./routes/reparto')
+const reportesRoutes = require('./routes/reportes')
 
 const app = express()
 
@@ -26,6 +27,7 @@ app.use('/api/catalogo', catalogoRoutes)
 app.use('/api/pedidos', pedidosRoutes)
 app.use('/api/notificaciones', notificacionesRoutes)
 app.use('/api/reparto', repartoRoutes)
+app.use('/api/reportes', reportesRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err)
