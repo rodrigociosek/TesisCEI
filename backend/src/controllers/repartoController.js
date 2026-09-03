@@ -60,4 +60,14 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar }
+async function iniciar(req, res, next) {
+  const planId = Number(req.params.id)
+  try {
+    const plan = await repartoServicio.iniciarReparto(req.usuario.id, planId)
+    res.json(plan)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { generarPlan, listarPlanes, obtenerDetalle, editarPedidos, eliminar, iniciar }
