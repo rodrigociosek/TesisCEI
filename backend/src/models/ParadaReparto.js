@@ -9,4 +9,4 @@ class ParadaReparto {
   }
 }
 
-module.exports = ParadaReparto
+export default ParadaReparto

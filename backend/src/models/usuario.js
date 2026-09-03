@@ -1,8 +1,8 @@
-const pool = require('../config/db')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const twilio = require('twilio')
-const CodigoVerificacion = require('./CodigoVerificacion')
+import pool from '../config/db.js'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+import twilio from 'twilio'
+import CodigoVerificacion from './CodigoVerificacion.js'
 
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
 
@@ -146,13 +146,6 @@ class Usuario {
     return true
   }
 
-  cambiarModoActivo() {
-    return true
-  }
-
-  cerrarSesion() {
-    return true
-  }
 }
 
-module.exports = Usuario
+export default Usuario

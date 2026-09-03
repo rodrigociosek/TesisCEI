@@ -1,4 +1,4 @@
-const pedidosServicio = require('../services/pedidos.servicio')
+import * as pedidosServicio from '../services/pedidos.servicio.js'
 
 async function confirmarPedido(req, res, next) {
   const { direccionEntrega, latitud, longitud, items } = req.body
@@ -40,9 +40,10 @@ async function historialComprador(req, res, next) {
   }
 }
 
-async function pedidosActivos(req, res, next) {
+async function pedidosDisponiblesReparto(req, res, next) {
+  const planId = req.query.planId ? Number(req.query.planId) : null
   try {
-    const pedidos = await pedidosServicio.obtenerPedidosActivos(req.usuario.id)
+    const pedidos = await pedidosServicio.obtenerPedidosDisponiblesReparto(req.usuario.id, planId)
     res.json(pedidos)
   } catch (error) {
     next(error)
@@ -161,4 +162,4 @@ async function cancelarPedido(req, res, next) {
   }
 }
 
-module.exports = { confirmarPedido, historialDistribuidor, historialComprador, pedidosActivos, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, cancelarPedido, proponerSustituto, aceptarSustitucion, rechazarSustitucion }
+export { confirmarPedido, historialDistribuidor, historialComprador, pedidosDisponiblesReparto, detalleComprador, detalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, cancelarPedido, proponerSustituto, aceptarSustitucion, rechazarSustitucion }

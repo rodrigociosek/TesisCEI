@@ -1,6 +1,6 @@
-const Pedido = require('../models/Pedido')
-const Producto = require('../models/Producto')
-const PrecioVolumen = require('../models/PrecioVolumen')
+import Pedido from '../models/Pedido.js'
+import Producto from '../models/Producto.js'
+import PrecioVolumen from '../models/PrecioVolumen.js'
 
 const LIMITE_RANKING_PRODUCTOS = 5
 
@@ -53,4 +53,4 @@ async function calcularRentabilidadPorPrecioVolumen(usuarioDistribuidorId) {
   return PrecioVolumen.listarConRentabilidadPorDistribuidor(usuarioDistribuidorId)
 }
 
-module.exports = { generarReporteRendimiento, calcularRentabilidadPorPrecioVolumen }
+export { generarReporteRendimiento, calcularRentabilidadPorPrecioVolumen }

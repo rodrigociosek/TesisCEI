@@ -1,8 +1,8 @@
-const pool = require('../config/db')
-const Pedido = require('../models/Pedido')
-const PropuestaSustitucion = require('../models/PropuestaSustitucion')
-const Producto = require('../models/Producto')
-const Notificacion = require('../models/Notificacion')
+import pool from '../config/db.js'
+import Pedido from '../models/Pedido.js'
+import PropuestaSustitucion from '../models/PropuestaSustitucion.js'
+import Producto from '../models/Producto.js'
+import Notificacion from '../models/Notificacion.js'
 
 async function confirmarPedido(compradorId, direccionEntrega, latitud, longitud, items) {
   return Pedido.confirmarDesdeCarrito(compradorId, direccionEntrega, latitud, longitud, items)
@@ -16,8 +16,10 @@ async function obtenerHistorialComprador(compradorId) {
   return Pedido.listarHistorialComprador(compradorId)
 }
 
-async function obtenerPedidosActivos(usuarioId) {
-  return Pedido.listarActivosDistribuidor(usuarioId)
+// planId (RF-064): al editar un reparto existente, incluye también sus
+// propios pedidos pendientes en la lista de disponibles.
+async function obtenerPedidosDisponiblesReparto(usuarioId, planId) {
+  return Pedido.listarDisponiblesRepartoDistribuidor(usuarioId, planId)
 }
 
 async function obtenerDetalleComprador(pedidoId, compradorId) {
@@ -125,4 +127,4 @@ async function responderSustitucion(propuestaId, compradorId, respuesta, cantida
   }
 }
 
-module.exports = { confirmarPedido, obtenerHistorialDistribuidor, obtenerHistorialComprador, obtenerPedidosActivos, obtenerDetalleComprador, obtenerDetalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto, responderSustitucion }
+export { confirmarPedido, obtenerHistorialDistribuidor, obtenerHistorialComprador, obtenerPedidosDisponiblesReparto, obtenerDetalleComprador, obtenerDetalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, proponerSustituto, responderSustitucion }

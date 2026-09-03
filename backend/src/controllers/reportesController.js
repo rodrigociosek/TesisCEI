@@ -1,4 +1,4 @@
-const reportesServicio = require('../services/reportes.servicio')
+import * as reportesServicio from '../services/reportes.servicio.js'
 
 // RF-037: períodos válidos. 'mes' es el default si no llega ninguno.
 const PERIODOS_VALIDOS = ['dia', 'semana', 'mes']
@@ -26,4 +26,4 @@ async function obtenerRentabilidad(req, res, next) {
   }
 }
 
-module.exports = { obtenerRendimiento, obtenerRentabilidad }
+export { obtenerRendimiento, obtenerRentabilidad }

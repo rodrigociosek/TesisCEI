@@ -1,8 +1,8 @@
-const pool = require('../config/db')
-const Notificacion = require('./Notificacion')
-const Producto = require('./Producto')
-const PedidoItem = require('./PedidoItem')
-const PropuestaSustitucion = require('./PropuestaSustitucion')
+import pool from '../config/db.js'
+import Notificacion from './Notificacion.js'
+import Producto from './Producto.js'
+import PedidoItem from './PedidoItem.js'
+import PropuestaSustitucion from './PropuestaSustitucion.js'
 
 const MOTIVOS_RECHAZO_PENDIENTE = [
   'Sin stock del producto solicitado',
@@ -93,6 +93,13 @@ class Pedido {
     }
   }
 
+  // RF-029/RF-051: panel único de pedidos del distribuidor, en cualquier
+  // estado (ya no hay pestañas separadas "Activos"/"Historial"). Orden:
+  // Pendiente (necesita acción) → Aceptado → En camino (todavía activos) →
+  // Rechazado → Cancelado → Entregado (terminales, confirmado con el
+  // usuario), y dentro de cada grupo, de más reciente a más antiguo.
+  // Cancelado (RF-069) se agrupa junto a Rechazado: ambos son terminales
+  // "no exitosos" que ya no requieren acción del distribuidor.
   static async listarHistorialDistribuidor(usuarioId) {
     const res = await pool.query(
       `SELECT
@@ -104,7 +111,8 @@ class Pedido {
            json_agg(
              json_build_object(
                'productoId', pr.id, 'nombreProducto', pr.nombre, 'imagenUrl', pr.imagen_url,
-               'cantidad', pi.cantidad, 'disponible', pr.habilitado
+               'cantidad', pi.cantidad, 'disponible', pr.habilitado,
+               'stockDisponible', (pr.stock_total - pr.stock_reservado)
              ) ORDER BY pi.id
            ) FILTER (WHERE pi.id IS NOT NULL),
            '[]'
@@ -116,7 +124,16 @@ class Pedido {
        LEFT JOIN producto pr ON pr.id = pi.producto_id
        WHERE d.usuario_id = $1
        GROUP BY p.id, u.nombre_completo, u.telefono
-       ORDER BY p.fecha_creacion DESC`,
+       ORDER BY
+         CASE p.estado
+           WHEN 'pendiente' THEN 1
+           WHEN 'aceptado' THEN 2
+           WHEN 'en_camino' THEN 3
+           WHEN 'rechazado' THEN 4
+           WHEN 'cancelado' THEN 4
+           WHEN 'entregado' THEN 5
+         END,
+         p.fecha_creacion DESC`,
       [usuarioId]
     )
     return res.rows
@@ -198,36 +215,6 @@ class Pedido {
     )
     if (res.rows.length === 0) return null
     return res.rows[0]
-  }
-
-  static async listarActivosDistribuidor(usuarioId) {
-    const res = await pool.query(
-      `SELECT
-         p.id, p.estado, p.fecha_creacion AS "fechaCreacion", p.direccion_entrega AS "direccionEntrega",
-         p.latitud, p.longitud,
-         u.nombre_completo AS "nombreComprador", u.telefono AS "telefonoComprador",
-         COALESCE(SUM(pi.cantidad * pi.precio_venta_congelado), 0) AS total,
-         COALESCE(
-           json_agg(
-             json_build_object(
-               'productoId', pr.id, 'nombreProducto', pr.nombre, 'imagenUrl', pr.imagen_url,
-               'cantidad', pi.cantidad, 'stockDisponible', (pr.stock_total - pr.stock_reservado)
-             ) ORDER BY pi.id
-           ) FILTER (WHERE pi.id IS NOT NULL),
-           '[]'
-         ) AS items
-       FROM pedido p
-       JOIN distribuidor d ON d.id = p.distribuidor_id
-       JOIN usuario u ON u.id = p.comprador_id
-       LEFT JOIN pedido_item pi ON pi.pedido_id = p.id
-       LEFT JOIN producto pr ON pr.id = pi.producto_id
-       WHERE d.usuario_id = $1
-         AND p.estado IN ('pendiente', 'aceptado', 'en_camino')
-       GROUP BY p.id, u.nombre_completo, u.telefono
-       ORDER BY p.fecha_creacion DESC`,
-      [usuarioId]
-    )
-    return res.rows
   }
 
   static async obtenerDetalleDistribuidor(pedidoId, distribuidorUsuarioId) {
@@ -614,4 +601,4 @@ class Pedido {
 // sobre el reparto que lo contiene.
 Pedido.mensajeCambioEstado = mensajeCambioEstado
 
-module.exports = Pedido
+export default Pedido

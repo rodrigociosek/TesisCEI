@@ -1,4 +1,4 @@
-const pool = require('../config/db')
+import pool from '../config/db.js'
 
 class PedidoItem {
   constructor(data) {
@@ -8,11 +8,6 @@ class PedidoItem {
     this.precioVolumenId = data.precio_volumen_id
     this.cantidad = data.cantidad
     this.precioVentaCongelado = data.precio_venta_congelado
-  }
-
-  congelarPrecio(precioVolumen) {
-    this.precioVolumenId = precioVolumen.id
-    this.precioVentaCongelado = precioVolumen.precioVenta
   }
 
   static async crear(pedidoId, productoId, precioVolumenId, cantidad, precioVentaCongelado, cliente = pool) {
@@ -44,4 +39,4 @@ class PedidoItem {
   }
 }
 
-module.exports = PedidoItem
+export default PedidoItem

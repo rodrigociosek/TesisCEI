@@ -1,6 +1,6 @@
-const pool = require('../config/db')
-const PrecioVolumen = require('./PrecioVolumen')
-const Notificacion = require('./Notificacion')
+import pool from '../config/db.js'
+import PrecioVolumen from './PrecioVolumen.js'
+import Notificacion from './Notificacion.js'
 
 const ESTADOS_VISIBILIDAD_VALIDOS = ['publicado', 'pausado']
 
@@ -21,14 +21,6 @@ class Producto {
     this.stockReservado = data.stock_reservado
     this.umbralMinimoStock = data.umbral_minimo_stock
     this.fechaCreacion = data.fecha_creacion
-  }
-
-  get stockDisponible() {
-    return this.stockTotal - this.stockReservado
-  }
-
-  obtenerStockDisponible() {
-    return this.stockDisponible
   }
 
   static validarDatosCreacion(nombre, marca, precioBase, stockInicial) {
@@ -289,10 +281,6 @@ class Producto {
     return res.rows.length > 0
   }
 
-  async tieneRegistrosAsociados() {
-    return this.tienePedidosRegistrados()
-  }
-
   async eliminarOdeshabilitar() {
     if (await this.tienePedidosRegistrados()) {
       await pool.query(
@@ -320,25 +308,6 @@ class Producto {
     return { id: this.id, umbralMinimoStock: this.umbralMinimoStock }
   }
 
-  async reservarStock(cantidad, cliente = pool) {
-    await cliente.query('UPDATE producto SET stock_reservado = stock_reservado + $1 WHERE id = $2', [cantidad, this.id])
-    this.stockReservado += Number(cantidad)
-  }
-
-  async liberarStock(cantidad, cliente = pool) {
-    await cliente.query('UPDATE producto SET stock_reservado = stock_reservado - $1 WHERE id = $2', [cantidad, this.id])
-    this.stockReservado -= Number(cantidad)
-  }
-
-  async confirmarSalidaStock(cantidad, cliente = pool) {
-    await cliente.query(
-      'UPDATE producto SET stock_total = stock_total - $1, stock_reservado = stock_reservado - $1 WHERE id = $2',
-      [cantidad, this.id]
-    )
-    this.stockTotal -= Number(cantidad)
-    this.stockReservado -= Number(cantidad)
-  }
-
   static async notificarSiCruzaUmbral(cliente, { nombre, umbralMinimoStock, usuarioDistribuidorId, disponibleAntes, disponibleDespues }) {
     if (umbralMinimoStock === null || umbralMinimoStock === undefined) return
     const umbral = Number(umbralMinimoStock)
@@ -354,4 +323,4 @@ class Producto {
   }
 }
 
-module.exports = Producto
+export default Producto

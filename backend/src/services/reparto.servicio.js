@@ -1,6 +1,6 @@
-const Distribuidor = require('../models/Distribuidor')
-const Pedido = require('../models/Pedido')
-const PlanReparto = require('../models/PlanReparto')
+import Distribuidor from '../models/Distribuidor.js'
+import Pedido from '../models/Pedido.js'
+import PlanReparto from '../models/PlanReparto.js'
 
 async function generarPlanCarga(usuarioId, pedidoIds) {
   const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
@@ -148,4 +148,4 @@ async function actualizarUbicacion(usuarioId, planId, latitud, longitud) {
   return { ok: true }
 }
 
-module.exports = { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque, marcarParada, actualizarUbicacion }
+export { generarPlanCarga, obtenerPlanes, obtenerDetalle, editarPedidos, eliminarReparto, iniciarReparto, cerrarEnBloque, marcarParada, actualizarUbicacion }

@@ -1,12 +1,12 @@
-const express = require('express')
+import express from 'express'
+import { verificarToken } from '../middleware/autenticacion.js'
+import * as preciosVolumenController from '../controllers/preciosVolumenController.js'
+
 const router = express.Router({ mergeParams: true })
-const { verificarToken } = require('../middleware/autenticacion')
-const preciosVolumenController = require('../controllers/preciosVolumenController')
 
 router.get('/', verificarToken, preciosVolumenController.listarPrecios)
 router.post('/', verificarToken, preciosVolumenController.registrarPrecio)
-router.post('/descuento-total', verificarToken, preciosVolumenController.aplicarDescuentoTotal)
 router.put('/:precioId', verificarToken, preciosVolumenController.editarPrecio)
 router.delete('/:precioId', verificarToken, preciosVolumenController.eliminarPrecio)
 
-module.exports = router
+export default router
