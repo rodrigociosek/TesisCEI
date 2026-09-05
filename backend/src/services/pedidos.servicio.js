@@ -74,4 +74,4 @@ async function cancelarPedido(pedidoId, compradorId) {
   return pedido.cancelar()
 }
 
-export { confirmarPedido, obtenerHistorialDistribuidor, obtenerHistorialComprador, obtenerPedidosDisponiblesReparto, obtenerDetalleComprador, obtenerDetalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado }
+export { confirmarPedido, obtenerHistorialDistribuidor, obtenerHistorialComprador, obtenerPedidosDisponiblesReparto, obtenerDetalleComprador, obtenerDetalleDistribuidor, aceptarPedido, rechazarPedido, avanzarEstado, cancelarPedido }
