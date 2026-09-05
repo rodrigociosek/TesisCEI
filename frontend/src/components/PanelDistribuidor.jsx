@@ -33,8 +33,8 @@ function cerrarSesionDistribuidor(navigate) {
 //
 // `activo`: ruta a resaltar en la navegación. Por defecto usa la ruta
 // actual; se puede forzar (por ejemplo en pantallas hijas de una sección,
-// como "/pedidos/:id/sustituir", que deben resaltar "Pedidos" aunque la
-// ruta exacta no esté en NAV_ITEMS).
+// como "/pedidos/:id", que deben resaltar "Pedidos" aunque la ruta exacta
+// no esté en NAV_ITEMS).
 function PanelDistribuidor({ tituloMobile, accionMobile, activo, children }) {
   const navigate = useNavigate()
   const location = useLocation()
