@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import TarjetaProductoPreview from '../../components/TarjetaProductoPreview'
 import './FichaProducto.css'
 
 function FichaProducto() {
   const navigate = useNavigate()
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   // --- Estado del producto ---
   const [categorias, setCategorias] = useState([])

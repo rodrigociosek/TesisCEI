@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Inicio.css'
 import './EditarPerfil.css'
@@ -20,8 +19,6 @@ function ProponerSustituto() {
   const [sustitutoId, setSustitutoId] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [errorEnvio, setErrorEnvio] = useState('')
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   useEffect(() => {
     Promise.all([

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import ModalMapaDireccion from '../../components/ModalMapaDireccion'
 import EstadoBadge from '../../components/EstadoBadge'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
@@ -100,8 +99,6 @@ function MisPedidos() {
     if (filtroTotalMaximo && Number(p.total) > Number(filtroTotalMaximo)) return false
     return true
   })
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   useEffect(() => {
     api.get('/api/pedidos/historial')

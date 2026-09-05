@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Inicio.css'
 
@@ -23,8 +22,6 @@ function Inicio() {
   const [aplicandoDescuento, setAplicandoDescuento] = useState(false)
   const [errorDescuento, setErrorDescuento] = useState('')
   const [mensajeDescuento, setMensajeDescuento] = useState('')
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   const cargarProductos = async (categoria = '', visibilidad = '', stock = '') => {
     setCargando(true)

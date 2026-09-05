@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import EstadoBadge from '../../components/EstadoBadge'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Inicio.css'
@@ -36,8 +35,6 @@ function Reparto() {
   const [motivoCerrar, setMotivoCerrar] = useState('')
   const [cerrandoEnBloque, setCerrandoEnBloque] = useState(false)
   const [errorCerrar, setErrorCerrar] = useState('')
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   const cargarPlanes = () => {
     setCargando(true)
