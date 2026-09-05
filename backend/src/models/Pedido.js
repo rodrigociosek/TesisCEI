@@ -198,9 +198,35 @@ class Pedido {
          COALESCE(
            json_agg(
              json_build_object(
+               'pedidoItemId', pi.id,
                'productoId', pr.id, 'nombreProducto', pr.nombre, 'imagenUrl', pr.imagen_url,
                'cantidad', pi.cantidad, 'precioVentaCongelado', pi.precio_venta_congelado,
-               'disponible', pr.habilitado
+               'disponible', pr.habilitado,
+               -- RF-025/RF-026: propuesta de sustitución pendiente para este ítem, si
+               -- la hay, con lo que el comprador necesita para responderla — elegir la
+               -- cantidad viendo los precios por volumen del sustituto (no se expone el
+               -- stock del distribuidor al comprador, RF-005). Sub-consulta escalar:
+               -- devuelve un objeto o NULL sin alterar la cardinalidad del json_agg ni
+               -- del SUM de arriba.
+               'propuestaSustitucion', (
+                 SELECT json_build_object(
+                   'id', ps.id,
+                   'productoSustituto', json_build_object(
+                     'id', prs.id, 'nombre', prs.nombre, 'imagenUrl', prs.imagen_url,
+                     'preciosVolumen', COALESCE((
+                       SELECT json_agg(
+                         json_build_object('cantidadMinima', pv.cantidad_minima, 'precioVenta', pv.precio_venta)
+                         ORDER BY pv.cantidad_minima
+                       )
+                       FROM precio_volumen pv WHERE pv.producto_id = prs.id
+                     ), '[]'::json)
+                   )
+                 )
+                 FROM propuesta_sustitucion ps
+                 JOIN producto prs ON prs.id = ps.producto_sustituto_id
+                 WHERE ps.pedido_item_id = pi.id AND ps.estado = 'pendiente'
+                 LIMIT 1
+               )
              ) ORDER BY pi.id
            ) FILTER (WHERE pi.id IS NOT NULL),
            '[]'
@@ -227,9 +253,27 @@ class Pedido {
          COALESCE(
            json_agg(
              json_build_object(
+               'pedidoItemId', pi.id,
                'productoId', pr.id, 'nombreProducto', pr.nombre, 'imagenUrl', pr.imagen_url,
                'cantidad', pi.cantidad, 'precioVentaCongelado', pi.precio_venta_congelado,
-               'stockDisponible', (pr.stock_total - pr.stock_reservado)
+               'stockDisponible', (pr.stock_total - pr.stock_reservado),
+               -- RF-025: propuesta de sustitución pendiente para este ítem, si la hay.
+               -- El distribuidor solo ve el sustituto propuesto y su stock (la cantidad
+               -- y el precio los define el comprador al aceptar, RF-026). Sub-consulta
+               -- escalar: devuelve un objeto o NULL sin alterar la cardinalidad.
+               'propuestaSustitucion', (
+                 SELECT json_build_object(
+                   'id', ps.id,
+                   'productoSustituto', json_build_object(
+                     'id', prs.id, 'nombre', prs.nombre, 'imagenUrl', prs.imagen_url,
+                     'stockDisponible', (prs.stock_total - prs.stock_reservado)
+                   )
+                 )
+                 FROM propuesta_sustitucion ps
+                 JOIN producto prs ON prs.id = ps.producto_sustituto_id
+                 WHERE ps.pedido_item_id = pi.id AND ps.estado = 'pendiente'
+                 LIMIT 1
+               )
              ) ORDER BY pi.id
            ) FILTER (WHERE pi.id IS NOT NULL),
            '[]'
@@ -340,17 +384,22 @@ class Pedido {
         throw Object.assign(new Error('El ítem no pertenece a este pedido.'), { status: 404 })
       }
 
+      // RF-025: el sustituto debe pertenecer al catálogo del mismo distribuidor
+      // Y estar habilitado — se exige también que esté publicado, que es lo que
+      // el comprador ve como "catálogo" (RF-016) y lo único que el frontend
+      // ofrece como sustituto (?visibilidad=publicado).
       const productoRes = await cliente.query(
-        `SELECT id FROM producto WHERE id = $1 AND distribuidor_id = $2`,
+        `SELECT id FROM producto
+         WHERE id = $1 AND distribuidor_id = $2 AND habilitado = true AND estado_visibilidad = 'publicado'`,
         [productoSustitutoId, this.distribuidorId]
       )
       if (productoRes.rows.length === 0) {
-        throw Object.assign(new Error('El producto sustituto debe pertenecer a tu catálogo.'), { status: 400 })
+        throw Object.assign(new Error('El producto sustituto debe ser un producto publicado de tu catálogo.'), { status: 400 })
       }
 
       const existente = await PropuestaSustitucion.obtenerPendientePorPedidoItem(pedidoItemId, cliente)
       if (existente) {
-        throw Object.assign(new Error('Ya existe una propuesta de sustitución pendiente para este ítem.'), { status: 409 })
+        throw Object.assign(new Error('Ya existe una propuesta de sustitución pendiente de respuesta para este artículo.'), { status: 409 })
       }
 
       const propuesta = await PropuestaSustitucion.crear(pedidoItemId, productoSustitutoId, cliente)
