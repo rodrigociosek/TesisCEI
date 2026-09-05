@@ -16,7 +16,10 @@ CREATE TABLE usuario (
   modo_distribuidor_activo BOOLEAN NOT NULL DEFAULT FALSE,
   cuenta_verificada BOOLEAN NOT NULL DEFAULT FALSE,
   consentimiento_datos_otorgado BOOLEAN NOT NULL DEFAULT FALSE,
-  fecha_creacion TIMESTAMP NOT NULL DEFAULT NOW()
+  fecha_creacion TIMESTAMP NOT NULL DEFAULT NOW(),
+  -- RNF-010 (Ley 18.331): ninguna cuenta puede terminar de crearse sin
+  -- el consentimiento otorgado.
+  CONSTRAINT usuario_consentimiento_otorgado CHECK (consentimiento_datos_otorgado = true)
 );
 
 CREATE TABLE codigo_verificacion (
@@ -97,7 +100,10 @@ CREATE TABLE precio_volumen (
   precio_costo DECIMAL,
   CONSTRAINT precio_venta_positivo CHECK (precio_venta > 0),
   CONSTRAINT cantidad_minima_positiva CHECK (cantidad_minima > 0),
-  CONSTRAINT precio_costo_no_negativo CHECK (precio_costo IS NULL OR precio_costo >= 0)
+  CONSTRAINT precio_costo_no_negativo CHECK (precio_costo IS NULL OR precio_costo >= 0),
+  -- RF-015: no puede haber dos precios por volumen con la misma cantidad
+  -- mínima para el mismo producto (incluida la cantidad mínima 1, el precio base).
+  CONSTRAINT precio_volumen_producto_cantidad_unica UNIQUE (producto_id, cantidad_minima)
 );
 
 -- RF-008: Confirmación de pedido
