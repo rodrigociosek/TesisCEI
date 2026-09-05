@@ -4,7 +4,6 @@ import { MapContainer, TileLayer, Marker, Tooltip, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Inicio.css'
 import './MisPedidos.css'
@@ -64,8 +63,6 @@ function CrearReparto() {
 
   const [generando, setGenerando] = useState(false)
   const [errorGenerar, setErrorGenerar] = useState('')
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   useEffect(() => {
     api.post('/distribuidor/obtenerPerfilPropio')

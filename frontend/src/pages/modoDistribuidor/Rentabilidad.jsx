@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Reportes.css'
 
@@ -15,8 +14,6 @@ function Rentabilidad() {
   const [lista, setLista] = useState([])
   const [cargando, setCargando] = useState(true)
   const [mensaje, setMensaje] = useState('')
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   useEffect(() => {
     api.get('/api/reportes/rentabilidad')

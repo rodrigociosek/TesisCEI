@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import TarjetaProductoPreview from '../../components/TarjetaProductoPreview'
 import './FichaProducto.css'
 
@@ -10,7 +9,6 @@ const API = 'http://localhost:3000'
 function EditarProducto() {
   const navigate = useNavigate()
   const { id } = useParams()
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   const [cargandoInicial, setCargandoInicial] = useState(true)
   const [errorCarga, setErrorCarga] = useState('')

@@ -3,12 +3,20 @@ import Pedido from '../models/Pedido.js'
 import PropuestaSustitucion from '../models/PropuestaSustitucion.js'
 import Producto from '../models/Producto.js'
 import Notificacion from '../models/Notificacion.js'
+import Distribuidor from '../models/Distribuidor.js'
 
 async function confirmarPedido(compradorId, direccionEntrega, latitud, longitud, items) {
   return Pedido.confirmarDesdeCarrito(compradorId, direccionEntrega, latitud, longitud, items)
 }
 
+// RNF-005: sin perfil de distribuidor no hay panel de pedidos que consultar
+// — antes devolvía [] a cualquier usuario autenticado, mismo criterio que
+// ya usa reparto.servicio.js en todos sus métodos.
 async function obtenerHistorialDistribuidor(usuarioId) {
+  const distribuidor = await Distribuidor.obtenerPorUsuarioId(usuarioId)
+  if (!distribuidor) {
+    throw Object.assign(new Error('No tenés un perfil de distribuidor configurado.'), { status: 404 })
+  }
   return Pedido.listarHistorialDistribuidor(usuarioId)
 }
 

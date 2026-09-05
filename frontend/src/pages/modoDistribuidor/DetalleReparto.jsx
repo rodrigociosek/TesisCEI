@@ -4,7 +4,6 @@ import { MapContainer, TileLayer, Marker, Tooltip, Polyline, useMap } from 'reac
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import EstadoBadge from '../../components/EstadoBadge'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Inicio.css'
@@ -119,8 +118,6 @@ function DetalleReparto() {
   // elegir una lo cierra y vuelve a mostrar "Cambiar estado".
   const [menuEstadoId, setMenuEstadoId] = useState(null)
   const menuEstadoRef = useRef(null)
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   useEffect(() => {
     if (menuEstadoId == null) return

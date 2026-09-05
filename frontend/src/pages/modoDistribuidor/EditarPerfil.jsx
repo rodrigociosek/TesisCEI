@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import CampoUbicacionMapa from '../../components/CampoUbicacionMapa'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
 import './Inicio.css'
@@ -16,7 +15,6 @@ function EditarPerfil() {
   const [mensaje, setMensaje] = useState('')
   const [guardando, setGuardando] = useState(false)
   const navigate = useNavigate()
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   // RF-042: dirección de partida del depósito. Se guarda junto con el resto
   // del perfil (RF-049) en una única acción de "Guardar cambios".

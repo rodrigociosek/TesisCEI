@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido, rutaInicio } from '../../lib/auth'
+import { rutaInicio } from '../../lib/auth'
 import CampoUbicacionMapa from '../../components/CampoUbicacionMapa'
 import './ConfigurarPerfil.css'
 
@@ -11,7 +11,6 @@ function ConfigurarPerfil() {
   const [zonaEntrega, setZonaEntrega] = useState('')
   const [mensaje, setMensaje] = useState('')
   const navigate = useNavigate()
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   // RF-048 (ampliación): la ubicación del depósito ya se puede elegir en
   // el mapa desde este mismo alta inicial, no solo después desde Editar

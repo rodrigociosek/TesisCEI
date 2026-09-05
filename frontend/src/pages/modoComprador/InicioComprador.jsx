@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido, rutaInicio } from '../../lib/auth'
+import { rutaInicio } from '../../lib/auth'
 import { useCarrito } from '../../context/CarritoContext'
 import CampanaNotificaciones from '../../components/CampanaNotificaciones'
 import BottomNavComprador from '../../components/BottomNavComprador'
@@ -17,10 +17,6 @@ function InicioComprador() {
   const { agregarProducto, totalItems } = useCarrito()
   const [menuPerfil, setMenuPerfil] = useState(false)
   const perfilRef = useRef(null)
-
-  useEffect(() => {
-    if (!tokenValido()) navigate('/login')
-  }, [navigate])
 
   useEffect(() => {
     if (!menuPerfil) return
