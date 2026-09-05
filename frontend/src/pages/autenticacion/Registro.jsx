@@ -7,6 +7,7 @@ function Registro() {
   const [nombre, setNombre] = useState('')
   const [telefonoInput, setTelefonoInput] = useState('')
   const [contrasena, setContrasena] = useState('')
+  const [consentimientoAceptado, setConsentimientoAceptado] = useState(false)
   const [mensaje, setMensaje] = useState('')
   const navigate = useNavigate()
 
@@ -19,12 +20,20 @@ function Registro() {
   }
 
   const handleRegistro = async () => {
+    // RNF-010 (Ley 18.331): feedback rápido en el cliente — el servidor
+    // vuelve a exigirlo igual, esto es solo para no hacer el viaje al
+    // servidor si ya se sabe que va a fallar.
+    if (!consentimientoAceptado) {
+      setMensaje('Debés aceptar el tratamiento de datos personales para continuar.')
+      return
+    }
     const telefono = formatearTelefono(telefonoInput)
     try {
       const res = await api.post('/auth/registro', {
         nombre,
         telefono,
-        contrasena
+        contrasena,
+        consentimientoDatosOtorgado: consentimientoAceptado
       })
       setMensaje(res.data.mensaje)
       navigate('/verificar', { state: { telefono, nombre, codigoDev: res.data.codigo_dev } })
@@ -85,9 +94,16 @@ function Registro() {
           </div>
 
           <label className="registro-consentimiento">
-            <input type="checkbox" className="registro-checkbox" />
+            <input
+              type="checkbox"
+              className="registro-checkbox"
+              checked={consentimientoAceptado}
+              onChange={e => setConsentimientoAceptado(e.target.checked)}
+            />
             <span className="registro-consentimiento-texto">
-              Acepto el tratamiento de mis datos personales conforme a la <u>Política de privacidad</u>.
+              Acepto el tratamiento de mis datos personales (nombre, teléfono y contraseña) para crear y
+              operar mi cuenta, conforme a la{' '}
+              <a href="/privacidad" target="_blank" rel="noopener noreferrer">Política de privacidad</a>.
             </span>
           </label>
 
