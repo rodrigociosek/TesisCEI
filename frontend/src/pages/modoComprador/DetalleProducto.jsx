@@ -35,6 +35,11 @@ function DetalleProducto() {
     localStorage.removeItem('nombre')
     localStorage.removeItem('telefono')
     localStorage.removeItem('modoDistribuidorActivo')
+    // RF-047: la sesión se invalida de inmediato. Sin este evento, el carrito
+    // (CarritoContext), la campana y el header quedarían con el estado de la
+    // sesión anterior hasta re-montarse — igual que el resto de las salidas
+    // de sesión del frontend.
+    window.dispatchEvent(new Event('auth-changed'))
     navigate('/catalogo', { replace: true })
   }
 
