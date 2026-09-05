@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido } from '../../lib/auth'
 import ModalMapaDireccion from '../../components/ModalMapaDireccion'
 import EstadoBadge from '../../components/EstadoBadge'
 import PanelDistribuidor from '../../components/PanelDistribuidor'
@@ -32,13 +31,12 @@ function DetallePedido() {
   const [error, setError] = useState(null)
   const [procesando, setProcesando] = useState(false)
   const [errorAccion, setErrorAccion] = useState(null)
+  const [whatsappLink, setWhatsappLink] = useState(null)
   const [modalRechazo, setModalRechazo] = useState(false)
   const [motivoRechazo, setMotivoRechazo] = useState('')
   const [errorRechazo, setErrorRechazo] = useState(null)
   const [rechazando, setRechazando] = useState(false)
   const [modalMapa, setModalMapa] = useState(false)
-
-  useEffect(() => { if (!tokenValido()) navigate('/login') }, [navigate])
 
   useEffect(() => {
     api.get(`/api/pedidos/${id}/detalle`)
@@ -48,13 +46,20 @@ function DetallePedido() {
   }, [id])
 
   const handleAceptar = async () => {
+    // RF-023: al aceptar hay que abrir WhatsApp con el mensaje pre-redactado.
+    // La ventana se abre AHORA, dentro del gesto del click — un window.open
+    // después del await se bloquea porque ya no hay activación del usuario.
+    // Si el navegador igual bloquea el popup, queda el enlace visible abajo.
+    const ventanaWhatsapp = window.open('', '_blank')
     setProcesando(true)
     setErrorAccion(null)
     try {
       const res = await api.patch(`/api/pedidos/${id}/aceptar`)
       setPedido(prev => ({ ...prev, estado: 'aceptado' }))
-      window.open(res.data.deepLink, '_blank')
+      setWhatsappLink(res.data.deepLink)
+      if (ventanaWhatsapp) ventanaWhatsapp.location.href = res.data.deepLink
     } catch (err) {
+      if (ventanaWhatsapp) ventanaWhatsapp.close()
       setErrorAccion(err.response?.data?.error || 'No fue posible completar la operación. Intente nuevamente más tarde.')
     } finally {
       setProcesando(false)
@@ -217,6 +222,16 @@ function DetallePedido() {
                       >
                         {procesando ? 'Procesando...' : 'Marcar En camino'}
                       </button>
+                      {whatsappLink && (
+                        <a
+                          className="pedidos-accion-btn"
+                          href={whatsappLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Abrir WhatsApp con el comprador
+                        </a>
+                      )}
                     </div>
                   )}
 
