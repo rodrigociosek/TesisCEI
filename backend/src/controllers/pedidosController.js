@@ -8,6 +8,14 @@ async function confirmarPedido(req, res, next) {
     return res.status(400).json({ error: 'Debés ingresar una dirección de entrega para continuar.' })
   }
 
+  // RF-008: todo pedido confirmado queda con coordenadas registradas (por el
+  // mapa o por geocodificación de la dirección de respaldo). Si la
+  // confirmación llega sin coordenadas válidas, no se procesa — mismo
+  // criterio que el chequeo de dirección de arriba (RF-008 [E2]).
+  if (latitud == null || longitud == null || !Number.isFinite(Number(latitud)) || !Number.isFinite(Number(longitud))) {
+    return res.status(400).json({ error: 'El pedido debe incluir la ubicación de la dirección de entrega.' })
+  }
+
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'El carrito debe contener al menos un producto.' })
   }

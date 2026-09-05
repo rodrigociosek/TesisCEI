@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
-import { tokenValido, rutaInicio } from '../../lib/auth'
+import { rutaInicio } from '../../lib/auth'
 import { useCarrito } from '../../context/CarritoContext'
 import ModalMapaDireccion from '../../components/ModalMapaDireccion'
 import './ConfirmacionPedido.css'
@@ -99,10 +99,6 @@ function ConfirmacionPedido() {
   const navigate = useNavigate()
   const { items, vaciar, totalItems } = useCarrito()
 
-  useEffect(() => {
-    if (!tokenValido()) navigate('/login')
-  }, [navigate])
-
   // Dirección vía mapa (método principal)
   const [dirMapa, setDirMapa] = useState(null)
   const [mapaAbierto, setMapaAbierto] = useState(false)
@@ -176,10 +172,17 @@ function ConfirmacionPedido() {
           setEnviando(false)
           return
         }
-        if (geocodificada) {
-          latitud = geocodificada.lat
-          longitud = geocodificada.lng
+        // RF-008: todo pedido confirmado tiene que quedar con coordenadas. Si
+        // la geocodificación de respaldo no las pudo obtener (sin resultado o
+        // falla de red), no se confirma el pedido — se le ofrece al comprador
+        // corregir la dirección o usar el mapa.
+        if (!geocodificada || !Number.isFinite(geocodificada.lat) || !Number.isFinite(geocodificada.lng)) {
+          setError('No pudimos ubicar la dirección ingresada. Revisá los datos o seleccioná el punto en el mapa.')
+          setEnviando(false)
+          return
         }
+        latitud = geocodificada.lat
+        longitud = geocodificada.lng
       }
       const payload = {
         direccionEntrega: direccionFinal,
