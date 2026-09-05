@@ -27,7 +27,6 @@ import Privacidad from './pages/Privacidad'
 import DetalleProducto from './pages/modoComprador/DetalleProducto'
 import DetallePedido from './pages/modoComprador/DetallePedido'
 import DetallePedidoDistribuidor from './pages/modoDistribuidor/DetallePedido'
-import ProponerSustituto from './pages/modoDistribuidor/ProponerSustituto'
 import Reportes from './pages/modoDistribuidor/Reportes'
 import Rentabilidad from './pages/modoDistribuidor/Rentabilidad'
 
@@ -68,7 +67,6 @@ function App() {
             <Route path='/editarPerfil' element={<EditarPerfil />} />
             <Route path='/pedidos' element={<MisPedidos />} />
             <Route path='/pedidos/:id' element={<DetallePedidoDistribuidor />} />
-            <Route path='/pedidos/:id/sustituir' element={<ProponerSustituto />} />
             <Route path='/reparto' element={<Reparto />} />
             <Route path='/reparto/nuevo' element={<CrearReparto />} />
             <Route path='/reparto/:id' element={<DetalleReparto />} />

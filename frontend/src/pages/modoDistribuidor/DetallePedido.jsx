@@ -202,14 +202,6 @@ function DetallePedido() {
                       >
                         Rechazar pedido
                       </button>
-                      {pedido.items.some(item => !item.propuestaSustitucion) && (
-                        <button
-                          className="pedidos-accion-btn"
-                          onClick={() => navigate(`/pedidos/${id}/sustituir`)}
-                        >
-                          Proponer sustituto
-                        </button>
-                      )}
                     </div>
                   )}
 
@@ -259,48 +251,6 @@ function DetallePedido() {
 
                   {errorAccion && <div className="pedidos-error-accion">{errorAccion}</div>}
                 </div>
-
-                {pedido.items
-                  .filter(item => item.propuestaSustitucion)
-                  .map(itemConPropuesta => {
-                    const sustituto = itemConPropuesta.propuestaSustitucion.productoSustituto
-                    return (
-                      <div key={itemConPropuesta.propuestaSustitucion.id} className="detallepedido-tarjeta">
-                        <div className="detallepedido-encabezado-tarjeta">
-                          <div>
-                            <div className="detallepedido-numero">Sustitución pedido #{pedido.id}</div>
-                            <div className="detallepedido-subtitulo">Pendiente de que el comprador elija la cantidad y confirme.</div>
-                          </div>
-                          <EstadoBadge estado="pendiente" className="detallepedido-estado" />
-                        </div>
-
-                        <div className="detallepedido-tabla">
-                          <div className="detallepedido-tabla-header detallepedido-tabla-header--sust">
-                            <div>Producto original</div>
-                            <div>Sustituto propuesto</div>
-                            <div>Stock disp.</div>
-                          </div>
-                          <div className="detallepedido-tabla-fila detallepedido-tabla-fila--sust">
-                            <div className="detallepedido-celda detallepedido-celda-producto">
-                              {itemConPropuesta.imagenUrl
-                                ? <img src={`http://localhost:3000${itemConPropuesta.imagenUrl}`} alt={itemConPropuesta.nombreProducto} className="detallepedido-thumb" />
-                                : <span className="detallepedido-thumb detallepedido-thumb-sinimg">Sin imagen</span>
-                              }
-                              {itemConPropuesta.nombreProducto}
-                            </div>
-                            <div className="detallepedido-celda detallepedido-celda-producto">
-                              {sustituto.imagenUrl
-                                ? <img src={`http://localhost:3000${sustituto.imagenUrl}`} alt={sustituto.nombre} className="detallepedido-thumb" />
-                                : <span className="detallepedido-thumb detallepedido-thumb-sinimg">Sin imagen</span>
-                              }
-                              {sustituto.nombre}
-                            </div>
-                            <div className={`detallepedido-celda${Number(sustituto.stockDisponible) === 0 ? ' detallepedido-stock-cero' : ''}`}>{sustituto.stockDisponible} u.</div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
               </>
             )}
 
