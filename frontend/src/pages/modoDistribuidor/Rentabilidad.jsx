@@ -31,7 +31,7 @@ function Rentabilidad() {
         <span className="reportes-subnav-item activo" onClick={() => navigate('/reportes/rentabilidad')}>Rentabilidad</span>
       </div>
 
-      <div className="panel-seccion-header">
+      <div className="panel-seccion-header panel-seccion-header--sub">
         <div>
           <h1 className="panel-h1">Rentabilidad por precio por volumen</h1>
           <p className="panel-subtitulo">Comparación entre precio de venta y precio de costo por tramo.</p>

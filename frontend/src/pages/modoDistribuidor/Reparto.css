@@ -594,10 +594,11 @@
   }
 }
 
-/* DetalleReparto usa el mismo master page que el resto del panel (ver
-   PanelDistribuidor), pero su información esencial — progreso, resumen de
-   ruta, "Iniciar reparto", "Volver" — vive en su propio
-   `.panel-seccion-header` (`.reparto-detalle-header`), no en el header
+/* DetalleReparto y CrearReparto usan el mismo master page que el resto del
+   panel (ver PanelDistribuidor), pero acciones esenciales — progreso,
+   "Iniciar reparto", "Volver" en DetalleReparto; "← Volver al panel" en
+   CrearReparto — viven en su propio `.panel-seccion-header`
+   (`.reparto-detalle-header` / `.reparto-crear-header`), no en el header
    mobile compacto genérico (que solo tiene lugar para un título). La regla
    general de Inicio.css lo oculta a partir de la misma medida en que el
    sidebar colapsa al drawer (1024px), así que acá se vuelve a mostrar y se
@@ -605,16 +606,25 @@
    en ningún tamaño angosto. */
 @media (max-width: 1024px) {
   .panel-seccion-header.reparto-detalle-header,
-  .panel-seccion-header.reparto-detalle-subheader {
+  .panel-seccion-header.reparto-detalle-subheader,
+  .panel-seccion-header.reparto-crear-header {
     display: flex;
     padding: 0 14px;
   }
 
-  .panel-seccion-header.reparto-detalle-header {
+  .panel-seccion-header.reparto-detalle-header,
+  .panel-seccion-header.reparto-crear-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
     margin-bottom: 16px;
+  }
+
+  /* CrearReparto: al ser un solo botón "volver", queda con su ancho
+     natural arriba a la izquierda (no full-width como las acciones de
+     .reparto-detalle-header). */
+  .panel-seccion-header.reparto-crear-header .reparto-btn-volver {
+    align-self: flex-start;
   }
 
   .reparto-detalle-header-acciones {

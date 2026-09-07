@@ -111,7 +111,7 @@ function MisPedidos() {
     <PanelDistribuidor tituloMobile="Pedidos">
             <div className="panel-contenido-centrado">
 
-            <div className="panel-seccion-header">
+            <div className="panel-seccion-header panel-seccion-header--sub">
               <div>
                 <h1 className="panel-h1">Pedidos</h1>
                 <p className="panel-subtitulo">

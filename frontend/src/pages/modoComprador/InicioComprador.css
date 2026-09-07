@@ -425,14 +425,13 @@
 
   .comprador-acciones {
     margin-left: auto;
+    gap: 8px;
   }
 
-  /* Deja espacio para el buscador en mobile: solo queda el perfil */
+  /* Deja espacio para el buscador en mobile: quedan la campana y el perfil.
+     El carrito va en la bottom-nav; las notificaciones no tienen otro
+     acceso en mobile, así que la campana se mantiene visible acá. */
   .comprador-btn-carrito {
-    display: none;
-  }
-
-  .comprador-acciones .campana {
     display: none;
   }
 

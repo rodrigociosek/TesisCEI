@@ -53,6 +53,21 @@
   overflow-y: auto;
 }
 
+/* En mobile la campana vive en un header angosto (comprador y distribuidor):
+   un dropdown de 320px anclado al ícono se sale del borde izquierdo. Se
+   despega del ícono y se fija a los bordes del viewport, sin depender de
+   dónde quede la campana en el header. */
+@media (max-width: 768px) {
+  .campana-dropdown {
+    position: fixed;
+    top: 56px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: 70vh;
+  }
+}
+
 .campana-vacio {
   padding: 20px;
   text-align: center;

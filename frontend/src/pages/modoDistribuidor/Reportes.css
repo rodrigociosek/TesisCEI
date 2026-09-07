@@ -25,6 +25,23 @@
   border-bottom-color: var(--color-primario);
 }
 
+/* Encabezado del dashboard: título (en .panel-seccion-header, que se oculta
+   a ≤1024px) + selector de período. El selector queda como hijo directo de
+   .reportes-encabezado para sobrevivir a ese display:none. */
+.reportes-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.reportes-encabezado .panel-seccion-header {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
 /* Selector de período (Día / Semana / Mes) — RF-041 */
 .reportes-periodo-tabs {
   display: flex;
@@ -48,6 +65,25 @@
 .reportes-periodo-tab.activo {
   background: var(--color-primario);
   color: var(--color-sobre-primario);
+}
+
+/* Mobile/tablet: el título desaparece (.panel-seccion-header); la bajada
+   se conserva vía --sub, apilada sobre el selector de período, que pasa a
+   ocupar el ancho como control segmentado. */
+@media (max-width: 1024px) {
+  .reportes-encabezado {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 16px;
+  }
+  .reportes-periodo-tabs {
+    width: 100%;
+  }
+  .reportes-periodo-tab {
+    flex: 1;
+    justify-content: center;
+    padding: 0 8px;
+  }
 }
 
 /* Mensajes de estado (cargando / error / vacío) */
