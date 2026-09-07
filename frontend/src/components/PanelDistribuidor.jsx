@@ -90,6 +90,10 @@ function PanelDistribuidor({ tituloMobile, accionMobile, activo, children }) {
       <div className="panel-mobile-header" data-tema="oscuro">
         <span className="panel-mobile-hamburger" onClick={() => setMenuAbierto(true)}>≡</span>
         <div className="panel-mobile-titulo">{tituloMobile}</div>
+        {/* El header de escritorio (.panel-master-header, con la campana) se
+            oculta a ≤1024px; sin esto las notificaciones no tienen acceso
+            en mobile/tablet. */}
+        <CampanaNotificaciones rutaDestino="/pedidos" rutaDetalle="/pedidos" />
         {accionMobile || <div style={{ width: 40 }} />}
       </div>
 

@@ -60,5 +60,5 @@
     grid-template-columns: 1fr;
   }
 
-  .detallepedido-celda:nth-child(5)::before { content: 'Stock disponible: '; color: var(--color-sobre-variante-superficie); }
+  .detallepedido-celda:nth-child(5)::before { content: 'Stock disponible:'; color: var(--color-sobre-variante-superficie); }
 }

@@ -120,7 +120,12 @@ function CrearReparto() {
 
   return (
     <PanelDistribuidor tituloMobile="Crear reparto" activo="/reparto">
-          <div className="panel-seccion-header">
+          {/* .reparto-crear-header: mismo criterio que .reparto-detalle-header
+              (ver Reparto.css) — el "Volver al panel" vive en este
+              .panel-seccion-header, que Inicio.css oculta a ≤1024px; el
+              modificador lo vuelve a mostrar, apilado, para que no
+              desaparezca en tablet/mobile. */}
+          <div className="panel-seccion-header reparto-crear-header">
             <div>
               <h1 className="panel-h1">Crear reparto</h1>
               <p className="panel-subtitulo">Seleccioná los pedidos a incluir, desde la lista o tocando sus puntos en el mapa. Necesitás al menos 2 pedidos.</p>

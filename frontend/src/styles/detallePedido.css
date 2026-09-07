@@ -228,7 +228,12 @@
     flex-wrap: wrap;
   }
 
-  .detallepedido-celda:nth-child(2)::before { content: 'Cantidad: '; color: var(--color-sobre-variante-superficie); }
-  .detallepedido-celda:nth-child(3)::before { content: 'Precio unit.: '; color: var(--color-sobre-variante-superficie); }
-  .detallepedido-celda:nth-child(4)::before { content: 'Subtotal: '; color: var(--color-sobre-variante-superficie); }
+  /* La celda es flex: el ::before es un flex item y su espacio final se
+     descarta, así que "Cantidad:1 u." quedaba pegado. El margen separa la
+     etiqueta del valor. */
+  .detallepedido-celda::before { margin-right: 4px; }
+
+  .detallepedido-celda:nth-child(2)::before { content: 'Cantidad:'; color: var(--color-sobre-variante-superficie); }
+  .detallepedido-celda:nth-child(3)::before { content: 'Precio unit.:'; color: var(--color-sobre-variante-superficie); }
+  .detallepedido-celda:nth-child(4)::before { content: 'Subtotal:'; color: var(--color-sobre-variante-superficie); }
 }

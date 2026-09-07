@@ -43,10 +43,16 @@ function Reportes() {
         <span className="reportes-subnav-item" onClick={() => navigate('/reportes/rentabilidad')}>Rentabilidad</span>
       </div>
 
-      <div className="panel-seccion-header">
-        <div>
-          <h1 className="panel-h1">Dashboard de rendimiento</h1>
-          <p className="panel-subtitulo">Resumen del período seleccionado.</p>
+      {/* El selector de período va FUERA de .panel-seccion-header: ese
+          contenedor se oculta con display:none a ≤1024px (Inicio.css) y se
+          llevaba consigo los tabs Día/Semana/Mes, dejando al distribuidor
+          fijo en el período por defecto en mobile/tablet (RF-041). */}
+      <div className="reportes-encabezado">
+        <div className="panel-seccion-header panel-seccion-header--sub">
+          <div>
+            <h1 className="panel-h1">Dashboard de rendimiento</h1>
+            <p className="panel-subtitulo">Resumen del período seleccionado.</p>
+          </div>
         </div>
         <div className="reportes-periodo-tabs">
           {PERIODOS.map(p => (

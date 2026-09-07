@@ -840,6 +840,22 @@
   .panel-contenido { padding: 0 0 20px; overflow-x: hidden; }
   .panel-seccion-header { display: none; }
 
+  /* Opt-in: páginas que conservan su línea de contexto (.panel-subtitulo)
+     en mobile, para no perder la orientación que sí está en escritorio.
+     El título ya lo muestra el header compacto (.panel-mobile-titulo), así
+     que acá se oculta el h1 (redundante); y las acciones que la página
+     movió a accionMobile (.panel-btn-nuevo) también se ocultan — no se
+     "des-ocultan" al volver visible el contenedor. */
+  .panel-seccion-header.panel-seccion-header--sub {
+    display: block;
+    margin-bottom: 14px;
+    padding: 0 14px;
+  }
+  .panel-seccion-header--sub .panel-h1,
+  .panel-seccion-header--sub .panel-btn-nuevo {
+    display: none;
+  }
+
   /* Filtros siempre visibles — sticky dentro del scroll. Siguen en
      flex-wrap (heredado de la regla base): si no entran en una línea,
      pasan a la siguiente, nunca se recortan ni se esconden. */

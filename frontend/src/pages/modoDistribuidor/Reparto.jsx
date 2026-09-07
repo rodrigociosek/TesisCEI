@@ -92,8 +92,15 @@ function Reparto() {
   }
 
   return (
-    <PanelDistribuidor tituloMobile="Reparto">
-          <div className="panel-seccion-header">
+    <PanelDistribuidor
+      tituloMobile="Reparto"
+      accionMobile={<button className="panel-mobile-nuevo" title="Crear reparto" onClick={() => navigate('/reparto/nuevo')}>+</button>}
+    >
+          {/* El header de escritorio (.panel-seccion-header, con "+ Crear
+              reparto") se oculta a ≤1024px; sin accionMobile no habría forma
+              de crear un reparto en mobile/tablet. El modificador --sub
+              conserva la bajada en mobile (sin el h1 ni el botón). */}
+          <div className="panel-seccion-header panel-seccion-header--sub">
             <div>
               <h1 className="panel-h1">Panel de repartos</h1>
               <p className="panel-subtitulo">Todos tus repartos, en cualquier estado, con su avance.</p>
