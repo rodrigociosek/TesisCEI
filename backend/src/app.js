@@ -13,6 +13,7 @@ import pedidosRoutes from './routes/pedidos.js'
 import notificacionesRoutes from './routes/notificaciones.js'
 import repartoRoutes from './routes/reparto.js'
 import reportesRoutes from './routes/reportes.js'
+import { smsModoDesarrollo } from './models/usuario.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -49,4 +50,7 @@ app.use((err, req, res, next) => {
 
 app.listen(3000, () => {
   console.log('Servidor corriendo en http://localhost:3000')
+  console.log(smsModoDesarrollo
+    ? 'SMS en modo desarrollo: los códigos se muestran en esta consola.'
+    : 'SMS con Twilio: los códigos se envían por SMS.')
 })

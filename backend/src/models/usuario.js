@@ -4,7 +4,27 @@ import jwt from 'jsonwebtoken'
 import twilio from 'twilio'
 import CodigoVerificacion from './CodigoVerificacion.js'
 
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER } = process.env
+
+// Modo desarrollo: no se envía el SMS y el mensaje se muestra en la consola del backend.
+// Se activa con SMS_MODO_DESARROLLO=true, o solo si faltan las credenciales de Twilio.
+export const smsModoDesarrollo =
+  process.env.SMS_MODO_DESARROLLO === 'true' || !(TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER)
+
+const client = smsModoDesarrollo ? null : twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+async function enviarSms(telefono, mensaje) {
+  if (smsModoDesarrollo) {
+    console.log(`[DEV] SMS a ${telefono}: ${mensaje}`)
+    return
+  }
+  try {
+    await client.messages.create({ body: mensaje, from: TWILIO_PHONE_NUMBER, to: telefono })
+  } catch (error) {
+    console.error('SMS no enviado:', error.message)
+    throw new Error('No fue posible completar la operación. Intente nuevamente más tarde.')
+  }
+}
 
 class Usuario {
   constructor(data) {
@@ -60,17 +80,7 @@ class Usuario {
     const codigo = CodigoVerificacion.generarCodigo()
     const expiracion = CodigoVerificacion.calcularExpiracion()
     await CodigoVerificacion.crear(usuarioId, codigo, 'activacion_cuenta', expiracion)
-    console.log(`[DEV] Código de verificación para ${telefono}: ${codigo}`)
-
-    try {
-      await client.messages.create({
-        body: `Tu código de verificación es: ${codigo}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: telefono
-      })
-    } catch (twilioError) {
-      console.log('SMS no enviado:', twilioError.message)
-    }
+    await enviarSms(telefono, `Tu código de verificación es: ${codigo}`)
   }
 
   static async verificarCodigoActivacion(telefono, codigo) {
@@ -127,17 +137,7 @@ class Usuario {
     const expiracion = CodigoVerificacion.calcularExpiracion()
 
     await CodigoVerificacion.crear(resultado.rows[0].id, codigo, 'recuperacion_password', expiracion)
-    console.log(`[DEV] Código de recuperación para ${telefono}: ${codigo}`)
-
-    try {
-      await client.messages.create({
-        body: `Tu código de recuperación es: ${codigo}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: telefono
-      })
-    } catch (twilioError) {
-      console.log('SMS no enviado:', twilioError.message)
-    }
+    await enviarSms(telefono, `Tu código de recuperación es: ${codigo}`)
   }
 
   static async verificarCodigoRecuperacion(telefono, codigo) {
