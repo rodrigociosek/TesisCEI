@@ -22,6 +22,8 @@ pnpm-debug.log*
 # Uploads (contenido generado en runtime, no código fuente)
 backend/public/uploads/*
 !backend/public/uploads/.gitkeep
+# Imágenes de los datos de demostración (BaseDeDatos/seed_demo.sql)
+!backend/public/uploads/demo/
 
 # Editor
 .vscode/*

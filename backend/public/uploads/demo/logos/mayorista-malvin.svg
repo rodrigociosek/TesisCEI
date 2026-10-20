@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#C2410C"/>
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#FFF1E6" stroke-opacity=".25" stroke-width="4"/>
+  <g transform="translate(256 186) scale(1.35) translate(-256 -196)">
+  <rect x="190" y="170" width="132" height="102" fill="#FFF1E6"/>
+  <path d="M180 132h152l14 42H166z" fill="#FFF1E6"/>
+  <path d="M166 174a19 14 0 0 0 38 0a19 14 0 0 0 38 0a19 14 0 0 0 38 0a19 14 0 0 0 38 0a19 14 0 0 0 28 0" fill="#7C2D12"/>
+  <path d="M206 132l-10 42M244 132l-4 42M282 132l4 42M320 132l10 42" stroke="#7C2D12" stroke-width="8"/>
+  <rect x="236" y="208" width="40" height="64" rx="4" fill="#C2410C"/>
+  <rect x="200" y="200" width="26" height="26" rx="3" fill="#C2410C" opacity=".5"/>
+  <rect x="286" y="200" width="26" height="26" rx="3" fill="#C2410C" opacity=".5"/>
+  </g>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1" fill="#FFF1E6">MALVÍN</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFF1E6" fill-opacity=".85">MAYORISTA</text>
+</svg>

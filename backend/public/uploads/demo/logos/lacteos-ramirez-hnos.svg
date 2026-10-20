@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#1F5FA8"/>
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#FFFFFF" stroke-opacity=".25" stroke-width="4"/>
+  <g transform="translate(256 186) scale(1.35) translate(-256 -196)">
+  <path d="M236 108h40v26l14 22v112a12 12 0 0 1-12 12h-44a12 12 0 0 1-12-12V156l14-22z" fill="#FFFFFF"/>
+  <rect x="232" y="100" width="48" height="14" rx="4" fill="#8CC6F2"/>
+  <path d="M256 186c-14 20-20 30-20 40a20 20 0 0 0 40 0c0-10-6-20-20-40z" fill="#1F5FA8"/>
+  </g>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1" fill="#FFFFFF">RAMÍREZ</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFFFFF" fill-opacity=".85">HNOS. · LÁCTEOS</text>
+</svg>

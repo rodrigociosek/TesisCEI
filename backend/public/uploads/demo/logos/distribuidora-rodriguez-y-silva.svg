@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#A21C5B"/>
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#FFE4F1" stroke-opacity=".25" stroke-width="4"/>
+  <g transform="translate(256 186) scale(1.35) translate(-256 -196)">
+  <path d="M206 196l-42-34v68zM306 196l42-34v68z" fill="#FDBA74"/>
+  <circle cx="256" cy="196" r="54" fill="#FFE4F1"/>
+  <path d="M222 156c30 20 40 60 30 92M262 144c28 24 34 64 20 100" stroke="#A21C5B" stroke-width="9" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#FFE4F1">R &amp; S</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFE4F1" fill-opacity=".85">RODRÍGUEZ Y SILVA</text>
+</svg>

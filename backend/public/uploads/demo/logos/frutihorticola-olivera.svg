@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#2F6B2F"/>
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#F59E0B" stroke-opacity=".25" stroke-width="4"/>
+  <g transform="translate(256 186) scale(1.35) translate(-256 -196)">
+  <path d="M232 146c-18-28-12-44 4-42 10 2 16 18 18 34M256 140c0-34 12-44 24-38 10 6 2 26-10 40M262 148c18-24 36-26 42-16 4 10-14 20-34 24" fill="#A3D977"/>
+  <path d="M220 160c22-12 50-12 72 0l-30 120c-2 8-10 8-12 0z" fill="#F59E0B"/>
+  <path d="M236 190h22M244 222h18M250 250h12" stroke="#2F6B2F" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1" fill="#F59E0B">OLIVERA</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#F59E0B" fill-opacity=".85">FRUTIHORTÍCOLA</text>
+</svg>

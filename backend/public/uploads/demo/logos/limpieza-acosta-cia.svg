@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#4C2A85"/>
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#E3D7FF" stroke-opacity=".25" stroke-width="4"/>
+  <g transform="translate(256 186) scale(1.35) translate(-256 -196)">
+  <circle cx="232" cy="210" r="56" fill="#E3D7FF" opacity=".95"/>
+  <circle cx="300" cy="164" r="32" fill="#E3D7FF" opacity=".8"/>
+  <circle cx="306" cy="250" r="22" fill="#E3D7FF" opacity=".65"/>
+  <path d="M212 188a26 26 0 0 1 24-20" stroke="#4C2A85" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M196 120l6 16 16 6-16 6-6 16-6-16-16-6 16-6z" fill="#7EE3D0"/>
+  </g>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1" fill="#E3D7FF">ACOSTA</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#E3D7FF" fill-opacity=".85">LIMPIEZA &amp; CÍA.</text>
+</svg>
