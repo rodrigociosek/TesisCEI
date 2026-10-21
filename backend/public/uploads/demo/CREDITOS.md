@@ -31,8 +31,8 @@ Fotos usadas en los datos de demostración de la aplicación. Son fotos publicad
 | centenario-jamon-magro-etiqueta-dorada-100g.webp | Jamón Magro Etiqueta Dorada (Centenario) | https://www.carniceriamodelo.com.uy/producto/jamon-magro-etiqueta-dorada-conaprole-100g/ | Carnicería Modelo, usada con fines académicos no comerciales |
 | centenario-salamin-al-vacio-sin-piel-180g.webp | Salamín al Vacío sin Piel (Centenario) | https://www.centenario.net.uy/producto/salamin-al-vacio-sin-piel-180g/ | Alimentos Centenario, usada con fines académicos no comerciales |
 | citral-arvejas-280g-x24.webp | Arvejas (Citral) | https://magus.com.uy/producto/arveja-citral-280g-caja-x-24-un/ | Magus, usada con fines académicos no comerciales |
-| coca-cola-refresco-clasica-1-5l-x6.webp | Refresco Clásica (Coca-Cola) | https://dipiandistribuidora.uy/producto/coca-cola-clasica-15-litros-pack-x6/ | Dipian Distribuidora, usada con fines académicos no comerciales |
-| coca-cola-refresco-clasica-600ml-x12.webp | Refresco Clásica (Coca-Cola) | https://dipiandistribuidora.uy/producto/coca-cola-clasica-600-ml-pack-x12/ | Dipian Distribuidora, usada con fines académicos no comerciales |
+| coca-cola-refresco-cola-clasica-1-5l-x6.webp | Refresco Cola Clásica (Coca-Cola) | https://dipiandistribuidora.uy/producto/coca-cola-clasica-15-litros-pack-x6/ | Dipian Distribuidora, usada con fines académicos no comerciales |
+| coca-cola-refresco-cola-clasica-600ml-x12.webp | Refresco Cola Clásica (Coca-Cola) | https://dipiandistribuidora.uy/producto/coca-cola-clasica-600-ml-pack-x12/ | Dipian Distribuidora, usada con fines académicos no comerciales |
 | coca-cola-refresco-zero-1-5l-x6.webp | Refresco Zero (Coca-Cola) | https://dipiandistribuidora.uy/producto/coca-cola-zero-15-litros-pack-x6/ | Dipian Distribuidora, usada con fines académicos no comerciales |
 | conaprole-helado-barra-crema-2l.webp | Helado Barra Crema (Conaprole) | https://www.cofas.com.uy/producto/helado-conaprole-barra-crema-2-lt/ | Cofas, usada con fines académicos no comerciales |
 | conaprole-helado-barra-dulce-de-leche-granizado-2l.webp | Helado Barra Dulce de Leche Granizado (Conaprole) | https://www.cofas.com.uy/producto/helado-conaprole-barra-d-leche-granizado-2-lt/ | Cofas, usada con fines académicos no comerciales |
@@ -52,7 +52,7 @@ Fotos usadas en los datos de demostración de la aplicación. Son fotos publicad
 | darnel-papel-film-28-cm-3m.webp | Papel Film 28 cm (Darnel) | https://www.carniceriamodelo.com.uy/producto/papel-film-darnel-wrap-28-cm-x-3-m/ | Carnicería Modelo, usada con fines académicos no comerciales |
 | elite-papel-higienico-hoja-simple-4-rollos-30m.webp | Papel Higiénico Hoja Simple (4 rollos) (Elite) | https://www.cofas.com.uy/producto/papel-higienico-elite-hoja-simple-30mt-x-4/ | Cofas, usada con fines académicos no comerciales |
 | faisan-vino-tinto-tannat-cabernet-1l-x12.webp | Vino Tinto Tannat Cabernet (Faisán) | https://magus.com.uy/producto/vino-faisan-tinto-tannat-cabernet-1l-tetra-x-caja-12-und/ | Magus, usada con fines académicos no comerciales |
-| famosa-galleta-famosa-sin-sal-420g-x6.webp | Galleta Famosa sin Sal (Famosa) | https://magus.com.uy/producto/galleta-famosa-sin-sal-420-gr-x-6-packs/ | Magus, usada con fines académicos no comerciales |
+| famosa-galleta-al-agua-sin-sal-420g-x6.webp | Galleta al Agua sin Sal (Famosa) | https://magus.com.uy/producto/galleta-famosa-sin-sal-420-gr-x-6-packs/ | Magus, usada con fines académicos no comerciales |
 | farming-queso-untable-magro-400g.webp | Queso Untable Magro (Farming) | https://www.cofas.com.uy/producto/queso-untable-magro-farming-400-gr/ | Cofas, usada con fines académicos no comerciales |
 | golden-chocolate-con-leche-65g-x12.webp | Chocolate con Leche (Golden) | https://magus.com.uy/producto/chocolate-golden-chocolate-con-leche-65gr-x-12-und/ | Magus, usada con fines académicos no comerciales |
 | gota-limpa-detergente-lavavajillas-500ml-x24.webp | Detergente Lavavajillas (Gota Limpa) | https://magus.com.uy/producto/detergente-gota-limpa-500cc-x-24/ | Magus, usada con fines académicos no comerciales |
@@ -62,7 +62,7 @@ Fotos usadas en los datos de demostración de la aplicación. Son fotos publicad
 | higienol-papel-higienico-8-rollos-60m.webp | Papel Higiénico (8 rollos) (Higienol) | https://www.cofas.com.uy/producto/papel-higienico-higienol-60mt-x8/ | Cofas, usada con fines académicos no comerciales |
 | hipopo-galleta-rellena-de-chocolate-80g-x36.webp | Galleta Rellena de Chocolate (Hipopo) | https://magus.com.uy/producto/galleta-rellena-hipopo-x-40-und-chocolate/ | Magus, usada con fines académicos no comerciales |
 | importada-banana-brasil-cajon-22kg.webp | Banana Brasil Cajón (Importada) | https://tutifruti.com.uy/producto/banana-brasil-cajon-x-22-kg-aprox | Tuti Fruti, usada con fines académicos no comerciales |
-| jupiter-bolsas-de-residuos-lavanda-10-un-60cm.webp | Bolsas de Residuos Lavanda (10 un.) (Júpiter) | https://magus.com.uy/producto/bolsa-de-residuos-jupiter-50-x-55-cm-blanca-limon-x-10-und/ | Magus, usada con fines académicos no comerciales |
+| jupiter-bolsas-de-residuos-10-un-60cm.webp | Bolsas de Residuos (10 un.) (Júpiter) | https://magus.com.uy/producto/bolsa-de-residuos-jupiter-50-x-55-cm-blanca-limon-x-10-und/ | Magus, usada con fines académicos no comerciales |
 | krachitos-papas-fritas-tradicional-30g-x6.webp | Papas Fritas Tradicional (Krachitos) | https://magus.com.uy/producto/papas-fritas-krachitos-30-gr-tradicional-x-6/ | Magus, usada con fines académicos no comerciales |
 | la-constancia-chorizo-al-vacio.webp | Chorizo al Vacío (La Constancia) | https://lapiara.com.uy/tienda/chorizo-al-vacio-la-constancia-2/ | La Piara, usada con fines académicos no comerciales |
 | la-mallorquina-pan-tortuga-6-un.webp | Pan Tortuga (6 un.) (La Mallorquina) | https://www.cofas.com.uy/producto/pan-tortuga-la-mallorquina-x-6/ | Cofas, usada con fines académicos no comerciales |
@@ -82,7 +82,7 @@ Fotos usadas en los datos de demostración de la aplicación. Son fotos publicad
 | mosmann-galleta-maria-tubo-132g-x20.webp | Galleta María Tubo (Mosmann) | https://magus.com.uy/producto/galleta-maria-mosmann-tubo-132gr-x-20-un/ | Magus, usada con fines académicos no comerciales |
 | natura-aceite-de-girasol-bidon-5l.webp | Aceite de Girasol Bidón (Natura) | https://magus.com.uy/producto/aceite-natura-5-l/ | Magus, usada con fines académicos no comerciales |
 | optimo-aceite-900ml-x20.webp | Aceite (Óptimo) | https://magus.com.uy/producto/aceite-optimo-900-ml-x-20-und/ | Magus, usada con fines académicos no comerciales |
-| oreo-galleta-oreo-original-118g-x12.webp | Galleta Oreo Original (Oreo) | https://magus.com.uy/producto/galleta-oreo-118gr-x-12/ | Magus, usada con fines académicos no comerciales |
+| oreo-galleta-original-118g-x12.webp | Galleta Original (Oreo) | https://magus.com.uy/producto/galleta-oreo-118gr-x-12/ | Magus, usada con fines académicos no comerciales |
 | paso-de-los-toros-refresco-pomelo-light-1-5l-x6.webp | Refresco Pomelo Light (Paso de los Toros) | https://dipiandistribuidora.uy/producto/pomelo-paso-de-los-toros-light-1-5l-pack-x6/ | Dipian Distribuidora, usada con fines académicos no comerciales |
 | patricia-cerveza-botella-1l-x12.webp | Cerveza Botella (Patricia) | https://vinavin.uy/producto/cerveza-patricia-1l-x12/ | Viñavín, usada con fines académicos no comerciales |
 | pepsi-refresco-cola-2l-x6.webp | Refresco Cola (Pepsi) | https://vinavin.uy/producto/pepsi-2-lts-funda-x6/ | Viñavín, usada con fines académicos no comerciales |
