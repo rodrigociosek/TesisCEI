@@ -6,7 +6,8 @@ import CodigoVerificacion from './CodigoVerificacion.js'
 
 const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER } = process.env
 
-// Modo desarrollo: no se envía el SMS y el mensaje se muestra en la consola del backend.
+// Modo desarrollo: no se envía el SMS; el mensaje se muestra en la consola del backend
+// y el código se devuelve en la respuesta para mostrarlo en la interfaz.
 // Se activa con SMS_MODO_DESARROLLO=true, o solo si faltan las credenciales de Twilio.
 export const smsModoDesarrollo =
   process.env.SMS_MODO_DESARROLLO === 'true' || !(TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER)
@@ -81,6 +82,7 @@ class Usuario {
     const expiracion = CodigoVerificacion.calcularExpiracion()
     await CodigoVerificacion.crear(usuarioId, codigo, 'activacion_cuenta', expiracion)
     await enviarSms(telefono, `Tu código de verificación es: ${codigo}`)
+    return smsModoDesarrollo ? codigo : undefined
   }
 
   static async verificarCodigoActivacion(telefono, codigo) {
@@ -138,6 +140,7 @@ class Usuario {
 
     await CodigoVerificacion.crear(resultado.rows[0].id, codigo, 'recuperacion_password', expiracion)
     await enviarSms(telefono, `Tu código de recuperación es: ${codigo}`)
+    return smsModoDesarrollo ? codigo : undefined
   }
 
   static async verificarCodigoRecuperacion(telefono, codigo) {

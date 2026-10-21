@@ -15,8 +15,8 @@ const registro = async (req, res) => {
     if (!contrasena || contrasena.length < LARGO_MIN_CONTRASENA) {
       return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 8 caracteres.' })
     }
-    await Usuario.registrarCuenta(nombre, telefono, contrasena, consentimientoDatosOtorgado)
-    res.json({ mensaje: 'Código enviado por SMS. Ingresalo para activar tu cuenta.' })
+    const codigoDesarrollo = await Usuario.registrarCuenta(nombre, telefono, contrasena, consentimientoDatosOtorgado)
+    res.json({ mensaje: 'Código enviado por SMS. Ingresalo para activar tu cuenta.', codigoDesarrollo })
   } catch (error) {
     res.status(400).json({ mensaje: error.message })
   }
@@ -45,8 +45,8 @@ const login = async (req, res) => {
 const recuperarContrasena = async (req, res) => {
   try {
     const { telefono } = req.body
-    await Usuario.solicitarRecuperacionContrasena(telefono)
-    res.json({ mensaje: 'Código enviado por SMS. Ingresalo para continuar.' })
+    const codigoDesarrollo = await Usuario.solicitarRecuperacionContrasena(telefono)
+    res.json({ mensaje: 'Código enviado por SMS. Ingresalo para continuar.', codigoDesarrollo })
   } catch (error) {
     res.status(400).json({ mensaje: error.message })
   }

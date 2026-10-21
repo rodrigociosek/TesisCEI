@@ -1,0 +1,12 @@
+.aviso-codigo-dev {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--color-info-suave);
+  color: var(--color-sobre-info-suave);
+  font-size: 14px;
+}
+
+.aviso-codigo-dev strong {
+  font-size: 16px;
+  letter-spacing: 1px;
+}

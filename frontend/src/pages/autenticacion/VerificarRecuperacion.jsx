@@ -6,6 +6,7 @@ import Hdr from '../../components/Hdr'
 import Tarjeta from '../../components/ui/Tarjeta'
 import Campo from '../../components/ui/Campo'
 import Boton from '../../components/ui/Boton'
+import AvisoCodigoDesarrollo from '../../components/AvisoCodigoDesarrollo'
 import Stepper from '../../components/ui/Stepper'
 import './VerificarRecuperacion.css'
 import Marca from '../../components/Marca'
@@ -37,6 +38,7 @@ function VerificarRecuperacion() {
         <Tarjeta as="main" className="auth-card col gap-m">
           <div className="titulo1">Verificar código</div>
           <p className="texto-mudo">Ingresá el código que te enviamos al {telefono}</p>
+          <AvisoCodigoDesarrollo codigo={location.state?.codigoDesarrollo} />
 
           <Stepper pasos={PASOS} pasoActivo={2} />
 
