@@ -42,9 +42,6 @@ function FichaProducto() {
   const [costoTramo, setCostoTramo] = useState('')
   const [errorPrecio, setErrorPrecio] = useState('')
 
-  const [descuentoTotal, setDescuentoTotal] = useState('')
-  const [errorDescuento, setErrorDescuento] = useState('')
-
   const [nombreDistribuidor, setNombreDistribuidor] = useState('')
 
   useEffect(() => {
@@ -126,20 +123,6 @@ function FichaProducto() {
   }
 
   const precioPorUnidadCalc = precioUnitario(precioVenta, cantidadMinima)
-
-  const handleAplicarDescuento = () => {
-    setErrorDescuento('')
-    const porcentaje = Number(descuentoTotal)
-    if (!porcentaje || porcentaje <= 0) return
-    if (porcentaje >= 100) {
-      setErrorDescuento('El descuento total debe ser menor a 100%.')
-      return
-    }
-    const factor = 1 - porcentaje / 100
-    if (precioBase) setPrecioBase(prev => (Number(prev) * factor).toFixed(2))
-    setTramosAdicionales(prev => prev.map(t => ({ ...t, precioVenta: Number((Number(t.precioVenta) * factor).toFixed(2)) })))
-    setDescuentoTotal('')
-  }
 
   const handleGuardarProducto = async () => {
     setErrorProducto('')
@@ -421,27 +404,6 @@ function FichaProducto() {
               <div className="ficha-precios-nota">
                 La cantidad de cada tramo se cuenta en la misma unidad que cargaste como producto: si cargaste un pack, la cantidad se mide en packs; si cargaste una unidad individual, se mide en unidades individuales.
               </div>
-            </Tarjeta>
-
-            <Tarjeta className="ficha-card">
-              <div className="ficha-card-titulo">Descuento total</div>
-              <div className="ficha-descuento-fila">
-                <Campo
-                  type="number"
-                  className="ficha-input-angosto"
-                  min="0"
-                  max="99"
-                  placeholder="0"
-                  value={descuentoTotal}
-                  onChange={e => setDescuentoTotal(e.target.value)}
-                />
-                <span className="ficha-ayuda-inline">% sobre todos los precios</span>
-                <Boton onClick={handleAplicarDescuento}>
-                  Aplicar
-                </Boton>
-              </div>
-              {errorDescuento && <div className="ficha-error">{errorDescuento}</div>}
-              <span className="ficha-ayuda">Al aplicar, baja ese porcentaje en el precio base y en todos los tramos cargados hasta ahora. Se guarda todo junto al guardar el producto.</span>
             </Tarjeta>
 
             {errorProducto && <div className="ficha-error">{errorProducto}</div>}
