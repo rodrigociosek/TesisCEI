@@ -6,6 +6,6 @@
   <path d="M206 186c26-26 72-30 98-8M200 222c30 12 74 10 104-10" stroke="#C2410C" stroke-width="7" fill="none" stroke-linecap="round"/>
   <circle cx="300" cy="196" r="17" fill="#7F1D1D"/><circle cx="300" cy="196" r="8" fill="#F6E3C5"/>
   </g>
-  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#F6E3C5">DON AURELIO</text>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#F6E3C5">SAN CARLOS</text>
   <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#F6E3C5" fill-opacity=".85">CARNES</text>
 </svg>

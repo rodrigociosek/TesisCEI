@@ -13,7 +13,7 @@ import './Inicio.css'
 import './MisPedidos.css'
 import './Reparto.css'
 
-const MONTEVIDEO = [-34.9011, -56.1645]
+const MALDONADO = [-34.9087, -54.9580]
 const COLUMNAS = ['', 'N° Pedido', 'Comprador', 'Dirección de entrega', 'Productos']
 const GRID = '44px 120px 180px 1fr 200px'
 
@@ -190,7 +190,7 @@ function CrearReparto() {
 
               <div className="reparto-crear-mapa-wrapper">
                 <div className="reparto-crear-mapa">
-                  <MapContainer center={latitudPartida != null ? [Number(latitudPartida), Number(longitudPartida)] : MONTEVIDEO} zoom={12} style={{ height: '100%', width: '100%' }}>
+                  <MapContainer center={latitudPartida != null ? [Number(latitudPartida), Number(longitudPartida)] : MALDONADO} zoom={12} style={{ height: '100%', width: '100%' }}>
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

@@ -6,6 +6,6 @@
   <circle cx="256" cy="196" r="54" fill="#FFE4F1"/>
   <path d="M222 156c30 20 40 60 30 92M262 144c28 24 34 64 20 100" stroke="#A21C5B" stroke-width="9" fill="none" stroke-linecap="round"/>
   </g>
-  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#FFE4F1">R &amp; S</text>
-  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFE4F1" fill-opacity=".85">RODRÍGUEZ Y SILVA</text>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#FFE4F1">PIRIÁPOLIS</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFE4F1" fill-opacity=".85">DISTRIBUIDORA</text>
 </svg>

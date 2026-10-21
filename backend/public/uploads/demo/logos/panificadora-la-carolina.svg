@@ -11,6 +11,6 @@
   <ellipse cx="256" cy="116" rx="10" ry="22" fill="#F2C66D"/>
   <path d="M218 268c20-8 56-8 76 0" stroke="#FFF4DC" stroke-width="6" fill="none" stroke-linecap="round"/>
   </g>
-  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#F2C66D">LA ESPIGA</text>
-  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#F2C66D" fill-opacity=".85">DEL PRADO</text>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#F2C66D">LA CAROLINA</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#F2C66D" fill-opacity=".85">PANIFICADORA</text>
 </svg>

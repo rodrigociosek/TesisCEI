@@ -10,6 +10,6 @@
   <rect x="200" y="200" width="26" height="26" rx="3" fill="#C2410C" opacity=".5"/>
   <rect x="286" y="200" width="26" height="26" rx="3" fill="#C2410C" opacity=".5"/>
   </g>
-  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1" fill="#FFF1E6">MALVÍN</text>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="1" fill="#FFF1E6">SAN FERNANDO</text>
   <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFF1E6" fill-opacity=".85">MAYORISTA</text>
 </svg>

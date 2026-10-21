@@ -333,7 +333,7 @@ function ConfirmacionPedido() {
                       </span>
                       <Campo
                         type="text"
-                        placeholder="Ej: Montevideo"
+                        placeholder="Ej: Maldonado"
                         value={ciudad}
                         onChange={e => setCiudad(e.target.value)}
                       />

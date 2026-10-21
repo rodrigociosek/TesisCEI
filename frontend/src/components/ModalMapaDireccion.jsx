@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadowPng,
 })
 
-const MONTEVIDEO = [-34.9011, -56.1645]
+const MALDONADO = [-34.9087, -54.9580]
 const ZOOM_INICIAL = 13
 const ZOOM_UBICACION = 16
 
@@ -56,7 +56,7 @@ function ModalMapaDireccion({
   instruccion = 'Tocá el mapa para colocar el pin en la dirección exacta de entrega, o arrastralo para ajustarlo.',
 }) {
   const [marcador, setMarcador] = useState(soloLectura && ubicacionInicial ? ubicacionInicial : null)
-  const [centro, setCentro] = useState(soloLectura && ubicacionInicial ? [ubicacionInicial.lat, ubicacionInicial.lng] : MONTEVIDEO)
+  const [centro, setCentro] = useState(soloLectura && ubicacionInicial ? [ubicacionInicial.lat, ubicacionInicial.lng] : MALDONADO)
   const [zoom, setZoom] = useState(soloLectura && ubicacionInicial ? ZOOM_UBICACION : ZOOM_INICIAL)
   const [direccionTexto, setDireccionTexto] = useState(soloLectura ? direccionInicial : '')
   const [geocodificando, setGeocodificando] = useState(false)

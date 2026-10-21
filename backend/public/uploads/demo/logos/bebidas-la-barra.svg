@@ -6,6 +6,6 @@
   <path d="M168 222c22-16 44-16 66 0s44 16 66 0 44-16 44-16" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>
   <path d="M168 258c22-16 44-16 66 0s44 16 66 0 44-16 44-16" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round" opacity=".7"/>
   </g>
-  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="1" fill="#FFFFFF">COSTA ESTE</text>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1" fill="#FFFFFF">LA BARRA</text>
   <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#FFFFFF" fill-opacity=".85">BEBIDAS</text>
 </svg>

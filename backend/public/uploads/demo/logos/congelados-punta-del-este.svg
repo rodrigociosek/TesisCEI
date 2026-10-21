@@ -9,6 +9,6 @@
   <g transform="rotate(300 256 196)" stroke="#E0F2FE" stroke-width="10" stroke-linecap="round" fill="none"><path d="M256 196V112"/><path d="M256 136l-18-16M256 136l18-16M256 164l-16-14M256 164l16-14"/></g>
   <circle cx="256" cy="196" r="12" fill="#7DD3FC"/>
   </g>
-  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="1" fill="#E0F2FE">FRÍO PEREYRA</text>
+  <text x="256" y="372" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="1" fill="#E0F2FE">PUNTA DEL ESTE</text>
   <text x="256" y="414" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#E0F2FE" fill-opacity=".85">CONGELADOS</text>
 </svg>
