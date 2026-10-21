@@ -11,7 +11,7 @@ import EstadoLista from '../../components/ui/EstadoLista'
 import './Inicio.css'
 
 const COLUMNAS = ['', 'Producto', 'Categoría', 'Stock disp.', 'Stock res.', { label: 'Estado', className: 'panel-tabla-celda--centro' }, 'Acciones']
-const GRID = '52px 1fr 140px 120px 120px 120px 180px'
+const GRID = '52px minmax(140px, 2fr) repeat(4, minmax(76px, 1fr)) minmax(110px, 1fr)'
 
 function Inicio() {
   const navigate = useNavigate()
