@@ -23,3 +23,9 @@ h1,
   display: flex;
   flex-direction: column;
 }
+
+/* Los z-index internos de Leaflet (400-1000) quedan contenidos en el mapa,
+   así el header y sus desplegables siempre se ven por delante. */
+.leaflet-container {
+  isolation: isolate;
+}
