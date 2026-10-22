@@ -6,7 +6,11 @@ function extraerMotivoRechazo(mensaje) {
   return match ? match[1] : null
 }
 
-async function obtenerPorUsuario(usuarioId) {
+async function obtenerPorUsuario(usuarioId, modo) {
+  const filtroModo = modo === 'distribuidor'
+    ? '(p.id IS NULL OR p.comprador_id <> n.usuario_id)'
+    : 'p.comprador_id = n.usuario_id'
+
   const res = await pool.query(
     `SELECT
        n.id, n.pedido_id AS "pedidoId", n.tipo, n.mensaje, n.leida,
@@ -32,7 +36,7 @@ async function obtenerPorUsuario(usuarioId) {
        FROM pedido_item pi
        WHERE pi.pedido_id = p.id
      ) totales ON true
-     WHERE n.usuario_id = $1
+     WHERE n.usuario_id = $1 AND ${filtroModo}
      ORDER BY n.fecha_creacion DESC`,
     [usuarioId]
   )
