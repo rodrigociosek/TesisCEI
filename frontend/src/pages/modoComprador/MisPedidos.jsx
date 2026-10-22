@@ -24,7 +24,7 @@ const COLUMNAS = [
   { label: 'Total', className: 'mispedidos-celda--derecha' },
   { label: 'Estado', className: 'mispedidos-celda--centro' },
 ]
-const GRID = '70px 100px 72px minmax(200px,1fr) 160px 100px 120px'
+const GRID = '64px 110px 56px minmax(0,2fr) minmax(0,1fr) 110px 120px'
 
 function formatearFecha(isoString) {
   const d = new Date(isoString)

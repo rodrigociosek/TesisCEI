@@ -8,8 +8,7 @@
 .mispedidos-main {
   flex: 1;
   padding: 28px 40px;
-  overflow: auto;
-  max-width: 900px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
@@ -38,6 +37,8 @@
   color: var(--color-texto);
   display: flex;
   align-items: center;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .mispedidos-celda--derecha {
@@ -125,25 +126,20 @@
 .mispedidos-cantidad {
   font-size: 13px;
   color: var(--color-texto);
+  white-space: nowrap;
 }
 
 .mispedidos-cards { display: none; }
 
-@media (max-width: 768px) {
-
-  .mispedidos-main {
-    padding: 16px;
-    padding-bottom: 72px;
-  }
-
-  .mispedidos-titulo  { font-size: 18px; }
-  .mispedidos-subtitulo { font-size: 12px; }
+/* Con menos ancho la tabla no entra cómoda: se pasa a tarjetas (2 columnas en tablet, 1 en mobile). */
+@media (max-width: 1024px) {
 
   .mispedidos-tabla { display: none; }
 
   .mispedidos-cards {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    align-items: start;
     gap: 10px;
   }
 
@@ -211,5 +207,17 @@
     font-weight: 700;
     color: var(--color-texto);
   }
+
+}
+
+@media (max-width: 768px) {
+
+  .mispedidos-main {
+    padding: 16px;
+    padding-bottom: 72px;
+  }
+
+  .mispedidos-titulo  { font-size: 18px; }
+  .mispedidos-subtitulo { font-size: 12px; }
 
 }
