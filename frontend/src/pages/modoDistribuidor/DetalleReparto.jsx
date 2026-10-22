@@ -526,7 +526,7 @@ function DetalleReparto() {
                   <div className="panel-seccion-header reparto-detalle-subheader" style={{ marginBottom: 0, padding: '12px 14px 0' }}>
                     <div className="panel-h1" style={{ fontSize: 16 }}>Orden de carga</div>
                   </div>
-                  {[...detalle.paradas].sort((a, b) => b.orden - a.orden).map((p, i) => (
+                  {[...detalle.paradas].sort((a, b) => a.orden - b.orden).map((p, i) => (
                     <div key={p.id}>
                       {i > 0 && <hr className="reparto-carga-separador" />}
                       <div className="reparto-carga-parada">
