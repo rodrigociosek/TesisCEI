@@ -17,7 +17,7 @@
 }
 
 .card-producto-imagen {
-  height: 140px;
+  height: 160px;
   width: 100%;
   border-radius: 0;
   border: none;
@@ -26,6 +26,14 @@
   object-fit: contain;
   background: var(--color-fondo);
   display: block;
+}
+
+/* Las fotos traen fondo blanco: con padding y multiply el producto queda
+   centrado sobre el fondo de la tarjeta, sin un recuadro blanco alrededor. */
+img.card-producto-imagen {
+  padding: 12px;
+  background: none;
+  mix-blend-mode: multiply;
 }
 
 .card-producto-info {
@@ -40,5 +48,6 @@
 }
 
 @media (max-width: 760px) {
-  .card-producto-imagen { height: 110px; }
+  .card-producto-imagen { height: 130px; }
+  img.card-producto-imagen { padding: 8px; }
 }
