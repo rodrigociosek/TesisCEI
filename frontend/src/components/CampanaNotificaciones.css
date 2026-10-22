@@ -1,3 +1,8 @@
+.campana .desplegable {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
 @media (max-width: 768px) {
   .campana .desplegable {
     position: fixed;
@@ -6,8 +11,6 @@
     right: 10px;
     width: auto;
     max-width: none;
-    max-height: 70vh;
-    overflow-y: auto;
   }
 }
 

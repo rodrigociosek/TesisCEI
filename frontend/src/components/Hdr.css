@@ -88,7 +88,7 @@
 .hdr .btn--ghost { color: var(--color-sobre-primario); border-color: color-mix(in oklch, var(--color-sobre-primario) 45%, transparent); }
 .hdr .btn--fill { background: var(--color-fondo); color: var(--color-primario); }
 .hdr .link { color: var(--color-sobre-primario); }
-.hdr .texto-mudo { color: color-mix(in oklch, var(--color-sobre-primario) 80%, transparent); }
+.hdr .texto-mudo:not(.desplegable *) { color: color-mix(in oklch, var(--color-sobre-primario) 80%, transparent); }
 .hdr .titulo1 { color: var(--color-sobre-primario); border-left-color: var(--color-sobre-primario); }
 
 .hdr .tab-row { border-color: color-mix(in oklch, var(--color-sobre-primario) 55%, transparent); }
