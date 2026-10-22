@@ -95,103 +95,107 @@ function DetalleProducto() {
       </Hdr>
 
       <div className="detalleproducto-contenido">
-        <Boton variante="ghost" onClick={() => navigate(-1)} style={{ marginBottom: 8 }}>← Volver</Boton>
-        <Miga items={[{ etiqueta: 'Catálogo' }, { etiqueta: producto.categoria }, { etiqueta: producto.nombre }]} className="detalleproducto-breadcrumb" />
+        <div className="detalleproducto-contenedor">
+          <Boton variante="ghost" onClick={() => navigate(-1)} style={{ marginBottom: 8 }}>← Volver</Boton>
+          <Miga items={[{ etiqueta: 'Catálogo' }, { etiqueta: producto.categoria }, { etiqueta: producto.nombre }]} className="detalleproducto-breadcrumb" />
 
-        <div className="fila gap-l detalleproducto-fila">
-          {producto.imagenUrl
-            ? <img src={`http://localhost:3000${producto.imagenUrl}`} alt={producto.nombre} className="detalleproducto-imagen" />
-            : <div className="placeholder-img detalleproducto-imagen">imagen</div>
-          }
+          <div className="detalleproducto-fila">
+            <div className="detalleproducto-imagen-caja">
+              {producto.imagenUrl
+                ? <img src={`http://localhost:3000${producto.imagenUrl}`} alt={producto.nombre} className="detalleproducto-imagen" />
+                : <div className="placeholder-img detalleproducto-imagen">imagen</div>
+              }
+            </div>
 
-          <div className="col gap-s flex1">
-            <span className="texto-mudo">
-              {producto.categoria} ·{' '}
-              <button
-                className="link"
-                onClick={() => navigate(`/perfilDistribuidor/${producto.distribuidorId}`, { replace: true })}
-              >
-                {producto.nombreDistribuidor}
-              </button>
-            </span>
+            <div className="col gap-s detalleproducto-info">
+              <span className="texto-mudo">
+                {producto.categoria} ·{' '}
+                <button
+                  className="link"
+                  onClick={() => navigate(`/perfilDistribuidor/${producto.distribuidorId}`, { replace: true })}
+                >
+                  {producto.nombreDistribuidor}
+                </button>
+              </span>
 
-            <div className="titulo1">{titulo}</div>
-            <p className="texto detalleproducto-descripcion">{producto.descripcion}</p>
+              <div className="titulo1">{titulo}</div>
+              <p className="texto detalleproducto-descripcion">{producto.descripcion}</p>
 
-            {producto.tarifas.length > 0 && (
-              <div className="detalleproducto-rango">
-                <span className="detalleproducto-rango-desde">Desde ${precioMinimo.toLocaleString('es-AR')}</span>
-                {precioBase != null && precioBase !== precioMinimo && (
-                  <span className="detalleproducto-rango-hasta">hasta ${precioBase.toLocaleString('es-AR')}</span>
-                )}
-              </div>
-            )}
-            {producto.stockDisponible <= 0 && (
-              <div className="detalleproducto-sin-stock">Sin stock disponible</div>
-            )}
-
-            <div className="titulo1">Precios por volumen</div>
-            {producto.tarifas.length === 0 ? (
-              <EstadoLista className="detalleproducto-tarifas-tabla">Este producto no tiene tarifas disponibles actualmente.</EstadoLista>
-            ) : (
-              <Tabla grid="1fr 1fr" className="detalleproducto-tarifas-tabla">
-                <TablaHeader columnas={['Cantidad mínima', 'Precio unitario']} />
-                {producto.tarifas.map((t, i) => (
-                  <TablaFila key={i}>
-                    <div>{t.cantidadMinima} u.</div>
-                    <div>${Number(t.precioVenta).toLocaleString('es-AR')}</div>
-                  </TablaFila>
-                ))}
-              </Tabla>
-            )}
-
-            <Tarjeta className="col gap-s detalleproducto-carrito-caja">
-              <div className="titulo1">Agregar al carrito</div>
               {producto.tarifas.length > 0 && (
-                <>
-                  <div className="fila gap-s">
-                    <Boton
-                      variante="outline"
-                      className="detalleproducto-stepper-btn"
-                      onClick={decrementar}
-                      aria-label="Restar unidad"
-                    >
-                      −
-                    </Boton>
-                    <Campo
-                      type="number"
-                      className="detalleproducto-stepper-valor"
-                      min="1"
-                      value={cantidad}
-                      onChange={handleCantidadChange}
-                      onBlur={handleCantidadBlur}
-                    />
-                    <Boton
-                      variante="outline"
-                      className="detalleproducto-stepper-btn"
-                      onClick={incrementar}
-                      aria-label="Sumar unidad"
-                    >
-                      +
-                    </Boton>
-                    <span className="texto-mudo">unidades</span>
-                  </div>
-                  <div className="detalleproducto-carrito-cantidad-info">
-                    ${precioAplicable(producto.tarifas, cantidad).toLocaleString('es-AR')} c/u
-                  </div>
-                </>
+                <div className="detalleproducto-rango">
+                  <span className="detalleproducto-rango-desde">Desde ${precioMinimo.toLocaleString('es-AR')}</span>
+                  {precioBase != null && precioBase !== precioMinimo && (
+                    <span className="detalleproducto-rango-hasta">hasta ${precioBase.toLocaleString('es-AR')}</span>
+                  )}
+                </div>
               )}
-              {token ? (
-                <Boton onClick={() => agregarProducto(producto, Number(cantidad) || 1)}>
-                  Agregar al carrito
-                </Boton>
+              {producto.stockDisponible <= 0 && (
+                <div className="detalleproducto-sin-stock">Sin stock disponible</div>
+              )}
+
+              <Tarjeta className="col gap-s detalleproducto-carrito-caja">
+                <div className="titulo1">Agregar al carrito</div>
+                {producto.tarifas.length > 0 && (
+                  <>
+                    <div className="fila gap-s">
+                      <Boton
+                        variante="outline"
+                        className="detalleproducto-stepper-btn"
+                        onClick={decrementar}
+                        aria-label="Restar unidad"
+                      >
+                        −
+                      </Boton>
+                      <Campo
+                        type="number"
+                        className="detalleproducto-stepper-valor"
+                        min="1"
+                        value={cantidad}
+                        onChange={handleCantidadChange}
+                        onBlur={handleCantidadBlur}
+                      />
+                      <Boton
+                        variante="outline"
+                        className="detalleproducto-stepper-btn"
+                        onClick={incrementar}
+                        aria-label="Sumar unidad"
+                      >
+                        +
+                      </Boton>
+                      <span className="texto-mudo">unidades</span>
+                    </div>
+                    <div className="detalleproducto-carrito-cantidad-info">
+                      ${precioAplicable(producto.tarifas, cantidad).toLocaleString('es-AR')} c/u
+                    </div>
+                  </>
+                )}
+                {token ? (
+                  <Boton onClick={() => agregarProducto(producto, Number(cantidad) || 1)}>
+                    Agregar al carrito
+                  </Boton>
+                ) : (
+                  <>
+                    <Boton disabled>Agregar al carrito</Boton>
+                    <div className="detalleproducto-carrito-nota">Iniciá sesión para comprar</div>
+                  </>
+                )}
+              </Tarjeta>
+
+              <div className="titulo1">Precios por volumen</div>
+              {producto.tarifas.length === 0 ? (
+                <EstadoLista className="detalleproducto-tarifas-tabla">Este producto no tiene tarifas disponibles actualmente.</EstadoLista>
               ) : (
-                <>
-                  <Boton disabled>Agregar al carrito</Boton>
-                  <div className="detalleproducto-carrito-nota">Iniciá sesión para comprar</div>
-                </>
+                <Tabla grid="1fr 1fr" className="detalleproducto-tarifas-tabla">
+                  <TablaHeader columnas={['Cantidad mínima', 'Precio unitario']} />
+                  {producto.tarifas.map((t, i) => (
+                    <TablaFila key={i}>
+                      <div>{t.cantidadMinima} u.</div>
+                      <div>${Number(t.precioVenta).toLocaleString('es-AR')}</div>
+                    </TablaFila>
+                  ))}
+                </Tabla>
               )}
-            </Tarjeta>
+            </div>
           </div>
         </div>
       </div>
