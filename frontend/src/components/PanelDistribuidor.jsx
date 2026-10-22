@@ -78,7 +78,7 @@ function PanelDistribuidor({ activo, buscadorValor, onBuscadorChange, children }
         <Boton variante="fill" onClick={() => navigate('/inicioComprador')}>
           Salir de distribuidora
         </Boton>
-        <CampanaNotificaciones rutaDestino="/pedidos" rutaDetalle="/pedidos" />
+        <CampanaNotificaciones modo="distribuidor" rutaDestino="/pedidos" rutaDetalle="/pedidos" />
         <div className="desplegable-ancla" ref={perfilRef}>
           <Avatar nombre={nombre} onClick={() => setMenuPerfil(v => !v)} />
           {menuPerfil && (

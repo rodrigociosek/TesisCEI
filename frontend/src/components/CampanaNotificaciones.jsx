@@ -5,16 +5,16 @@ import useDesplegable from '../hooks/useDesplegable'
 import Boton from './ui/Boton'
 import './CampanaNotificaciones.css'
 
-function CampanaNotificaciones({ rutaDestino = '/misPedidos', rutaDetalle }) {
+function CampanaNotificaciones({ modo = 'comprador', rutaDestino = '/misPedidos', rutaDetalle }) {
   const navigate = useNavigate()
   const [notificaciones, setNotificaciones] = useState([])
   const { abierto, setAbierto, ref } = useDesplegable()
 
   useEffect(() => {
-    api.get('/api/notificaciones')
+    api.get('/api/notificaciones', { params: { modo } })
       .then(res => setNotificaciones(res.data))
       .catch(() => {})
-  }, [])
+  }, [modo])
 
   const noLeidas = notificaciones.filter(n => !n.leida).length
 
