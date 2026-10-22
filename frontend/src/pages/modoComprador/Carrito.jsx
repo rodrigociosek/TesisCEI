@@ -67,11 +67,11 @@ function Carrito() {
                   {grupo.items.map(item => (
                     <div key={item.id} className="fila gap-m carrito-item">
                       {item.imagenUrl
-                        ? <img src={`http://localhost:3000${item.imagenUrl}`} alt={item.nombre} className="carrito-item-img" />
+                        ? <img src={`http://localhost:3000${item.imagenUrl}`} alt={item.nombre} className="carrito-item-img carrito-item-img--link" onClick={() => navigate(`/producto/${item.id}`)} />
                         : <div className="placeholder-img carrito-item-img">—</div>
                       }
                       <div className="col flex1">
-                        <span className="texto">{item.nombre}</span>
+                        <span className="link carrito-item-nombre" onClick={() => navigate(`/producto/${item.id}`)}>{item.nombre}</span>
                         <span className="texto-mudo">Precio est. ${(precioAplicable(item.tarifas, item.cantidad) || 0).toLocaleString('es-AR')} c/u</span>
                       </div>
                       <div className="fila gap-s">

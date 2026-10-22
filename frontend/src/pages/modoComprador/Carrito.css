@@ -41,6 +41,10 @@
   flex-shrink: 0;
 }
 
+.carrito-item-img--link { cursor: pointer; }
+
+.carrito-item-nombre { align-self: flex-start; font-size: 16px; }
+
 .btn.carrito-item-btn {
   width: 44px;
   height: 44px;
