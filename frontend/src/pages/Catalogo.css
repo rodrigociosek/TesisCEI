@@ -6,8 +6,11 @@
 }
 
 .catalogo-filtros {
+  width: 100%;
+  padding: 16px max(40px, calc((100% - 1280px) / 2));
   background: var(--color-fondo);
   border-bottom: 1px solid var(--color-borde);
+  box-sizing: border-box;
 }
 
 .catalogo-filtro-campo {
@@ -17,6 +20,9 @@
 
 .catalogo-contenido {
   flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 32px 40px;
 }
 
